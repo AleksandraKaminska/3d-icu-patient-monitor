@@ -1,6 +1,11 @@
-import { useMemo } from 'react'
+import { useMemo, useRef } from 'react'
+import { useFrame } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
+import { useVitals } from '../../store/vitals.js'
+
+// Reused scratch color for the per-frame SpO2 tint.
+const _tint = new THREE.Color()
 
 /**
  * PatientModel — patient loaded from a rigged GLB (Tripo, meshopt).
@@ -27,6 +32,7 @@ export default function PatientModel({
   neck = [0.4, 0, 0], // flex the neck to lift the head onto the pillow
 }) {
   const { scene } = useGLTF('/models/patient.glb')
+  const materials = useRef([])
 
   const { scale, offset } = useMemo(() => {
     // Bounds measured offline — Box3.setFromObject is unreliable on skinned
@@ -34,15 +40,30 @@ export default function PatientModel({
     const SIZE = [0.18, 0.99, 1.0]
     const CENTER = [0, 0.495, 0]
     const s = targetLength / Math.max(...SIZE)
+    const mats = []
     scene.traverse((m) => {
       if (m.isMesh || m.isSkinnedMesh) {
         m.castShadow = true
         m.receiveShadow = true
         m.frustumCulled = false
+        for (const mat of Array.isArray(m.material) ? m.material : [m.material]) {
+          if (mat) mats.push(mat)
+        }
       }
     })
+    materials.current = mats
     return { scale: s, offset: [-CENTER[0] * s, -CENTER[1] * s, -CENTER[2] * s] }
   }, [scene, targetLength])
+
+  // SpO2 heatmap: multiply the skin texture by a tint that goes bluish
+  // (cyanosis) as saturation drops. The model shares one material, so this
+  // washes the whole patient slightly blue under hypoxia.
+  useFrame(() => {
+    const spo2 = useVitals.getState().current.spo2
+    const t = THREE.MathUtils.clamp((94 - spo2) / 14, 0, 1)
+    _tint.setRGB(1 - 0.5 * t, 1 - 0.38 * t, 1 - 0.08 * t)
+    for (const m of materials.current) m.color.copy(_tint)
+  })
 
   // Pose the arms: rotate the upper-arm bones relative to their bind pose.
   useMemo(() => {

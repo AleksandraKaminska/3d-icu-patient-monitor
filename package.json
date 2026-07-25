@@ -1,9 +1,9 @@
 {
-  "name": "medtech-digital-twin-icu",
+  "name": "3d-icu-patient-monitor",
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Cyfrowy Bliźniak Oddziału Intensywnej Terapii — 3D ICU training & monitoring simulator",
+  "description": "3D ICU Patient Monitor — interactive intensive-care simulator with real-time ECG/SpO₂, a 3D patient, ventilator and IV drip (React + React Three Fiber)",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

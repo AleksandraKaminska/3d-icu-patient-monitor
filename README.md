@@ -1,9 +1,9 @@
-# ICU Digital Twin
+# 3D ICU Patient Monitor
 
 An interactive 3D intensive-care unit (ICU) simulator — a training tool for
-medical staff and a demonstration of real-time vital-sign monitoring. All the
-equipment and waveforms are generated mathematically, with no pre-recorded
-footage.
+medical staff and a demonstration of real-time vital-sign monitoring. The ECG
+and SpO₂ waveforms are generated mathematically (no pre-recorded footage), and
+the 3D patient turns cyanotic as saturation drops.
 
 ![stack](https://img.shields.io/badge/React-19-61dafb) ![r3f](https://img.shields.io/badge/React_Three_Fiber-9-black) ![tailwind](https://img.shields.io/badge/Tailwind-4-38bdf8)
 

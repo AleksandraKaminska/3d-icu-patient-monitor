@@ -15,10 +15,10 @@ export default function App() {
           </span>
           <div>
             <h1 className="text-sm font-semibold tracking-tight">
-              ICU Digital Twin
+              3D ICU Patient Monitor
             </h1>
             <p className="text-xs text-slate-400">
-              Intensive Care Unit Digital Twin · 3D simulator
+              Interactive intensive-care simulator · real-time vitals
             </p>
           </div>
         </div>

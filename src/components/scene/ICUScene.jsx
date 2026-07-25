@@ -6,6 +6,7 @@ import Room from './Room.jsx'
 import Bed from './Bed.jsx'
 import PatientModel from './PatientModel.jsx'
 import Pillow from './Pillow.jsx'
+import Cannula from './Cannula.jsx'
 import Cardiomonitor from './Cardiomonitor.jsx'
 import Ventilator from './Ventilator.jsx'
 import IVStand from './IVStand.jsx'
@@ -60,6 +61,9 @@ export default function ICUScene() {
           rollRot={[0, 0, Math.PI / 2]}
           neck={[-0.4, 0, 0]}
         />
+        {/* IV cannula on the back of the patient's right hand (computed:
+            wrist + fingers direction). */}
+        <Cannula pos={[-0.337, 1.135, -0.14]} rot={[0, 0, 0]} />
         <Cardiomonitor position={[1.6, 0, -0.7]} rotation={[0, Math.PI, 0]} targetHeight={1.9} />
         <Ventilator position={[-2.2, 0, -1.0]} />
         <IVStand position={[-1.25, 0, -0.6]} rotation={[0, Math.PI, 0]} />
