@@ -1,5 +1,22 @@
 @import "tailwindcss";
 
+/* Design system — clinical / editorial premium.
+   One signature accent (clinical teal), hairline dividers, calm typography. */
+:root {
+  --bg: #0a0d11;
+  --panel: #0e1218;
+  --elev: #12171e;
+  --line: rgba(255, 255, 255, 0.07);
+  --line-2: rgba(255, 255, 255, 0.12);
+  --text: #e9ecf1;
+  --muted: #9aa4b2;
+  --faint: #616b79;
+  --accent: #35d0ba;
+  --accent-soft: rgba(53, 208, 186, 0.14);
+  --warn: #f2b24e;
+  --alarm: #f2706d;
+}
+
 html,
 body,
 #root {
@@ -9,34 +26,74 @@ body,
 
 body {
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  background: #0a0f1a;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  letter-spacing: -0.01em;
   overscroll-behavior: none;
 }
 
-/* Range sliders styled to match the clinical dark UI */
+::selection {
+  background: var(--accent-soft);
+}
+
+/* Thin scrollbars that match the theme */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+
+/* Refined range slider — filled track set inline per value */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
-  height: 4px;
-  border-radius: 9999px;
-  background: #1e293b;
+  width: 100%;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
   outline: none;
+  cursor: pointer;
 }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 9999px;
-  background: currentColor;
-  cursor: pointer;
-  box-shadow: 0 0 8px currentColor;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #fff;
+  border: 3px solid var(--accent);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+  transition: transform 0.12s ease;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
 }
 input[type="range"]::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  border: none;
-  border-radius: 9999px;
-  background: currentColor;
-  cursor: pointer;
+  width: 14px;
+  height: 14px;
+  border: 3px solid var(--accent);
+  border-radius: 999px;
+  background: #fff;
+}
+
+@keyframes softpulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.live-dot {
+  animation: softpulse 1.8s ease-in-out infinite;
 }

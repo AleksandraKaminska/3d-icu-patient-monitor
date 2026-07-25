@@ -8,7 +8,8 @@ import PatientModel from './PatientModel.jsx'
 import Pillow from './Pillow.jsx'
 import Cannula from './Cannula.jsx'
 import Cardiomonitor from './Cardiomonitor.jsx'
-import Ventilator from './Ventilator.jsx'
+import VentilatorModel from './VentilatorModel.jsx'
+import VentScreen from './VentScreen.jsx'
 import IVStand from './IVStand.jsx'
 import Tubes from './Tubes.jsx'
 
@@ -65,7 +66,10 @@ export default function ICUScene() {
             wrist + fingers direction). */}
         <Cannula pos={[-0.337, 1.135, -0.14]} rot={[0, 0, 0]} />
         <Cardiomonitor position={[1.6, 0, -0.7]} rotation={[0, Math.PI, 0]} targetHeight={1.9} />
-        <Ventilator position={[-2.2, 0, -1.0]} />
+        <VentilatorModel targetHeight={1.7} position={[-1.45, 0, -1.15]} rotation={[0, -Math.PI / 2, 0]} />
+        {/* Live ventilator screen, placed in world space onto the model's
+            painted screen (tune pos/rot against a render). */}
+        <VentScreen pos={[-1.45, 1.4, -1.14]} rot={[-0.35, 0, 0]} size={[0.32, 0.22]} />
         <IVStand position={[-1.25, 0, -0.6]} rotation={[0, Math.PI, 0]} />
         <Tubes />
 

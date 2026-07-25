@@ -2,19 +2,28 @@ import { useEffect, useState } from 'react'
 import { useVitals, SCENARIOS } from '../../store/vitals.js'
 
 /**
- * ControlPanel — right-hand clinical control panel (Tailwind).
- * Lets you pick a clinical scenario or manually set target vitals with
- * sliders. Everything writes to the Zustand store; the 3D scene reacts.
+ * ControlPanel — clinical/editorial control panel.
+ * Pick a scenario or set target vitals with sliders; everything writes to the
+ * Zustand store and the 3D scene reacts.
  */
 
-function Slider({ label, unit, value, min, max, step = 1, color, onChange }) {
+function SectionTitle({ children }) {
+  return (
+    <h2 className="text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ color: 'var(--faint)' }}>
+      {children}
+    </h2>
+  )
+}
+
+function Slider({ label, unit, value, min, max, step = 1, onChange }) {
+  const pct = ((value - min) / (max - min)) * 100
   return (
     <label className="block">
-      <div className="mb-1 flex items-center justify-between text-xs">
-        <span className="text-slate-300">{label}</span>
-        <span className="font-mono tabular-nums" style={{ color }}>
+      <div className="mb-2 flex items-baseline justify-between">
+        <span className="text-[13px]" style={{ color: 'var(--muted)' }}>{label}</span>
+        <span className="font-mono text-[13px] tabular-nums" style={{ color: 'var(--text)' }}>
           {value}
-          <span className="ml-1 text-slate-500">{unit}</span>
+          <span className="ml-1" style={{ color: 'var(--faint)' }}>{unit}</span>
         </span>
       </div>
       <input
@@ -24,8 +33,9 @@ function Slider({ label, unit, value, min, max, step = 1, color, onChange }) {
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        style={{ color }}
-        className="w-full"
+        style={{
+          background: `linear-gradient(to right, var(--accent) 0%, var(--accent) ${pct}%, rgba(255,255,255,0.1) ${pct}%, rgba(255,255,255,0.1) 100%)`,
+        }}
       />
     </label>
   )
@@ -35,8 +45,6 @@ export default function ControlPanel() {
   const applyScenario = useVitals((s) => s.applyScenario)
   const setTarget = useVitals((s) => s.setTarget)
   const scenario = useVitals((s) => s.scenario)
-
-  // Local mirror of the target so sliders feel responsive.
   const [t, setT] = useState(() => useVitals.getState().target)
 
   useEffect(() => {
@@ -50,59 +58,75 @@ export default function ControlPanel() {
   }
 
   return (
-    <aside className="flex w-80 shrink-0 flex-col gap-5 overflow-y-auto border-l border-slate-800 bg-slate-950 p-5">
+    <aside
+      className="flex w-[336px] shrink-0 flex-col gap-7 overflow-y-auto p-6"
+      style={{ background: 'var(--panel)', borderLeft: '1px solid var(--line)' }}
+    >
       {/* Scenarios */}
-      <section>
-        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-          Clinical scenarios
-        </h2>
-        <div className="grid grid-cols-2 gap-2">
+      <section className="flex flex-col gap-3">
+        <SectionTitle>Clinical scenario</SectionTitle>
+        <div className="flex flex-col gap-1.5">
           {Object.entries(SCENARIOS).map(([key, s]) => {
             const active = scenario === key
             return (
               <button
                 key={key}
                 onClick={() => applyScenario(key)}
-                className={`rounded-lg border px-3 py-2 text-left text-xs font-medium transition ${
-                  active
-                    ? 'border-cyan-500/60 bg-cyan-500/15 text-cyan-300'
-                    : 'border-slate-800 bg-slate-900/50 text-slate-300 hover:border-slate-600'
-                }`}
+                className="group flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-left transition"
+                style={{
+                  background: active ? 'var(--accent-soft)' : 'transparent',
+                  border: `1px solid ${active ? 'rgba(53,208,186,0.35)' : 'var(--line)'}`,
+                }}
               >
-                {s.label}
+                <span
+                  className="h-1.5 w-1.5 shrink-0 rounded-full transition"
+                  style={{ background: active ? 'var(--accent)' : 'var(--faint)' }}
+                />
+                <span
+                  className="text-[13px] font-medium"
+                  style={{ color: active ? 'var(--text)' : 'var(--muted)' }}
+                >
+                  {s.label}
+                </span>
               </button>
             )
           })}
         </div>
-        <p className="mt-2 text-[11px] leading-snug text-slate-500">
+        <p className="text-[11px] leading-relaxed" style={{ color: 'var(--faint)' }}>
           {scenario === 'custom'
-            ? 'Manual mode — vitals set with the sliders.'
+            ? 'Manual mode — vitals set with the sliders below.'
             : SCENARIOS[scenario]?.desc}
         </p>
       </section>
 
+      <div style={{ height: 1, background: 'var(--line)' }} />
+
       {/* Manual controls */}
-      <section className="flex flex-col gap-4">
-        <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-          Target vitals
-        </h2>
-        <Slider label="Heart rate (HR)" unit="bpm" value={Math.round(t.hr)} min={30} max={180} color="#22e08a" onChange={(v) => update({ hr: v })} />
-        <Slider label="Saturation (SpO₂)" unit="%" value={Math.round(t.spo2)} min={60} max={100} color="#22d3ee" onChange={(v) => update({ spo2: v })} />
-        <Slider label="Respiratory rate" unit="/min" value={Math.round(t.respRate)} min={5} max={40} color="#60a5fa" onChange={(v) => update({ respRate: v })} />
-        <Slider label="Tidal volume (VT)" unit="ml" value={Math.round(t.tidalVolume)} min={200} max={700} step={10} color="#a78bfa" onChange={(v) => update({ tidalVolume: v })} />
-        <Slider label="Mean art. pressure (MAP)" unit="mmHg" value={Math.round(t.map)} min={40} max={120} color="#f472b6" onChange={(v) => update({ map: v })} />
+      <section className="flex flex-col gap-5">
+        <SectionTitle>Target vitals</SectionTitle>
+        <Slider label="Heart rate" unit="bpm" value={Math.round(t.hr)} min={30} max={180} onChange={(v) => update({ hr: v })} />
+        <Slider label="Saturation" unit="%" value={Math.round(t.spo2)} min={60} max={100} onChange={(v) => update({ spo2: v })} />
+        <Slider label="Respiratory rate" unit="/min" value={Math.round(t.respRate)} min={5} max={40} onChange={(v) => update({ respRate: v })} />
+        <Slider label="Tidal volume" unit="ml" value={Math.round(t.tidalVolume)} min={200} max={700} step={10} onChange={(v) => update({ tidalVolume: v })} />
+        <Slider label="Mean art. pressure" unit="mmHg" value={Math.round(t.map)} min={40} max={120} onChange={(v) => update({ map: v })} />
       </section>
 
-      {/* Legend */}
-      <section className="mt-auto rounded-lg border border-slate-800 bg-slate-900/40 p-3 text-[11px] leading-relaxed text-slate-400">
-        <p className="mb-1 font-semibold text-slate-300">Math in the scene</p>
-        <ul className="list-inside list-disc space-y-1">
-          <li>ECG: sum of Gaussian curves (P-QRS-T waves)</li>
-          <li>SpO₂: plethysmograph wave from sine harmonics</li>
-          <li>Skin: color interpolation by saturation (cyanosis)</li>
-          <li>Ventilator: piston lerp by VT volume</li>
-          <li>IV drip: drop fall from the gravity vector</li>
-          <li>Tubes: CatmullRom splines in 3D</li>
+      {/* Method note */}
+      <section className="mt-auto flex flex-col gap-2 pt-2">
+        <SectionTitle>Generated in code</SectionTitle>
+        <ul className="flex flex-col gap-1.5 text-[11px] leading-relaxed" style={{ color: 'var(--faint)' }}>
+          {[
+            'ECG — sum of Gaussian P-QRS-T waves',
+            'SpO₂ — plethysmograph from sine harmonics',
+            'Skin — cyanosis tint by saturation',
+            'IV drip — drop fall from a gravity vector',
+            'Tubes — Catmull-Rom splines in 3D',
+          ].map((line) => (
+            <li key={line} className="flex gap-2">
+              <span style={{ color: 'var(--accent)' }}>·</span>
+              <span>{line}</span>
+            </li>
+          ))}
         </ul>
       </section>
     </aside>

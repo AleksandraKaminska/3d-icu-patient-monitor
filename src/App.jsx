@@ -1,58 +1,83 @@
+import { useEffect, useState } from 'react'
 import ICUScene from './components/scene/ICUScene.jsx'
 import ControlPanel from './components/ui/ControlPanel.jsx'
 import VitalsBar from './components/ui/VitalsBar.jsx'
 
+function Clock() {
+  const [now, setNow] = useState(() => new Date())
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000)
+    return () => clearInterval(id)
+  }, [])
+  const t = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  return <span className="font-mono text-sm tabular-nums" style={{ color: 'var(--muted)' }}>{t}</span>
+}
+
 export default function App() {
   return (
-    <div className="flex h-full w-full flex-col bg-slate-950 text-slate-100">
-      {/* Nagłówek */}
-      <header className="flex items-center justify-between border-b border-slate-800 px-5 py-3">
+    <div className="flex h-full w-full flex-col" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
+      {/* Header */}
+      <header
+        className="flex items-center justify-between px-6 py-3.5"
+        style={{ borderBottom: '1px solid var(--line)' }}
+      >
         <div className="flex items-center gap-3">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-500/15 text-cyan-400 ring-1 ring-cyan-500/30">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <span
+            className="flex h-9 w-9 items-center justify-center rounded-xl"
+            style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}
+          >
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 12h4l2 6 4-14 2 8h6" />
             </svg>
           </span>
-          <div>
-            <h1 className="text-sm font-semibold tracking-tight">
-              3D ICU Patient Monitor
-            </h1>
-            <p className="text-xs text-slate-400">
-              Interactive intensive-care simulator · real-time vitals
+          <div className="leading-tight">
+            <h1 className="text-[15px] font-medium tracking-tight">3D ICU · Patient Monitor</h1>
+            <p className="text-xs" style={{ color: 'var(--faint)' }}>
+              Interactive intensive-care simulator
             </p>
           </div>
         </div>
-        <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400 ring-1 ring-emerald-500/20">
-          ● LIVE
-        </span>
+
+        <div className="flex items-center gap-5">
+          <div className="hidden items-center gap-2 sm:flex">
+            <span className="h-1.5 w-1.5 rounded-full live-dot" style={{ background: 'var(--accent)' }} />
+            <span className="text-xs font-medium tracking-wide" style={{ color: 'var(--muted)' }}>
+              MONITORING
+            </span>
+          </div>
+          <span className="hidden h-4 w-px sm:block" style={{ background: 'var(--line-2)' }} />
+          <Clock />
+        </div>
       </header>
 
-      {/* Górny pasek parametrów życiowych */}
+      {/* Live vitals strip */}
       <VitalsBar />
 
-      {/* Główny obszar: scena 3D + panel sterowania */}
+      {/* Scene + controls */}
       <main className="flex min-h-0 flex-1">
         <div className="relative min-w-0 flex-1">
           <ICUScene />
-          <div className="pointer-events-none absolute bottom-3 left-3 rounded-md bg-slate-900/70 px-3 py-1.5 text-[11px] text-slate-400 backdrop-blur">
+          <div
+            className="pointer-events-none absolute bottom-3 left-3 rounded-full px-3 py-1 text-[11px]"
+            style={{ background: 'rgba(10,13,17,0.6)', color: 'var(--faint)', backdropFilter: 'blur(6px)' }}
+          >
             Drag to orbit · scroll to zoom
           </div>
-          {/* CC-BY 4.0 attribution — required for the bed + IV pole assets */}
-          <div className="absolute bottom-3 right-3 max-w-[46%] rounded-md bg-slate-900/70 px-3 py-1.5 text-right text-[10px] leading-relaxed text-slate-500 backdrop-blur">
+          <div
+            className="absolute bottom-3 right-3 max-w-[52%] rounded-full px-3 py-1 text-right text-[10px] leading-relaxed"
+            style={{ background: 'rgba(10,13,17,0.6)', color: 'var(--faint)', backdropFilter: 'blur(6px)' }}
+          >
             3D:{' '}
-            <a href="https://skfb.ly/oJZ6C" target="_blank" rel="noreferrer" className="text-slate-400 underline hover:text-slate-200">
-              "Hospital Bed"
-            </a>{' '}
-            by Carlos.Maciel ·{' '}
-            <a href="https://skfb.ly/6RzEu" target="_blank" rel="noreferrer" className="text-slate-400 underline hover:text-slate-200">
-              "IV Pole"
-            </a>{' '}
-            by Mouch ·{' '}
-            <a href="https://skfb.ly/pFUZn" target="_blank" rel="noreferrer" className="text-slate-400 underline hover:text-slate-200">
-              "Pillow"
-            </a>{' '}
-            by monupaswan944 ·{' '}
-            <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer" className="text-slate-400 underline hover:text-slate-200">
+            <a href="https://skfb.ly/oJZ6C" target="_blank" rel="noreferrer" className="underline decoration-white/20 hover:text-white/80">
+              Hospital Bed
+            </a>{', '}
+            <a href="https://skfb.ly/6RzEu" target="_blank" rel="noreferrer" className="underline decoration-white/20 hover:text-white/80">
+              IV Pole
+            </a>{', '}
+            <a href="https://skfb.ly/pFUZn" target="_blank" rel="noreferrer" className="underline decoration-white/20 hover:text-white/80">
+              Pillow
+            </a>{' · '}
+            <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer" className="underline decoration-white/20 hover:text-white/80">
               CC BY 4.0
             </a>
           </div>

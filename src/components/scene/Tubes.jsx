@@ -37,12 +37,47 @@ function saggingLine(start, end, sag = 0.4, n = 12) {
   return pts
 }
 
-function Tube({ points, radius = 0.02, color = '#e2e8f0', opacity = 1, clamp = true }) {
+// Build a corrugated (ribbed) tube along a curve by modulating the radius.
+function corrugatedTube(curve, tubularSegments, radius, radialSegments) {
+  const frames = curve.computeFrenetFrames(tubularSegments, false)
+  const positions = [], normals = [], indices = []
+  const P = new THREE.Vector3()
+  for (let i = 0; i <= tubularSegments; i++) {
+    curve.getPointAt(i / tubularSegments, P)
+    const N = frames.normals[i], B = frames.binormals[i]
+    const r = radius * (1 + 0.22 * Math.sin(i * 2.0)) // ribs
+    for (let j = 0; j <= radialSegments; j++) {
+      const v = (j / radialSegments) * Math.PI * 2
+      const s = Math.sin(v), c = -Math.cos(v)
+      const nx = c * N.x + s * B.x, ny = c * N.y + s * B.y, nz = c * N.z + s * B.z
+      positions.push(P.x + r * nx, P.y + r * ny, P.z + r * nz)
+      normals.push(nx, ny, nz)
+    }
+  }
+  for (let i = 1; i <= tubularSegments; i++) {
+    for (let j = 1; j <= radialSegments; j++) {
+      const a = (radialSegments + 1) * (i - 1) + (j - 1)
+      const b = (radialSegments + 1) * i + (j - 1)
+      const c = (radialSegments + 1) * i + j
+      const d = (radialSegments + 1) * (i - 1) + j
+      indices.push(a, b, d, b, c, d)
+    }
+  }
+  const g = new THREE.BufferGeometry()
+  g.setIndex(indices)
+  g.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
+  g.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3))
+  return g
+}
+
+function Tube({ points, radius = 0.02, color = '#e2e8f0', opacity = 1, clamp = true, corrugated = false }) {
   const geometry = useMemo(() => {
     const pts = points.map((p) => (clamp ? clampAboveBed(p) : new THREE.Vector3(...p)))
     const curve = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.5)
-    return new THREE.TubeGeometry(curve, 96, radius, 12, false)
-  }, [points, radius, clamp])
+    return corrugated
+      ? corrugatedTube(curve, 140, radius, 12)
+      : new THREE.TubeGeometry(curve, 96, radius, 12, false)
+  }, [points, radius, clamp, corrugated])
 
   return (
     <mesh geometry={geometry} castShadow>
@@ -60,17 +95,20 @@ function Tube({ points, radius = 0.02, color = '#e2e8f0', opacity = 1, clamp = t
 export default function Tubes() {
   return (
     <group>
-      {/* Intubation tube: ventilator -> patient's mouth */}
+      {/* Intubation tube: ventilator outlet -> the model's breathing-circuit
+          connector at the mouth. White, opaque, corrugated. */}
       <Tube
-        color="#cbd5e1"
-        radius={0.022}
-        opacity={0.9}
+        color="#f4f6f9"
+        radius={0.021}
+        corrugated
+        clamp={false}
         points={[
-          [-2.2, 1.4, -1.0],
-          [-1.4, 1.55, -1.1],
-          [-0.7, 1.48, -1.0],
-          [-0.3, 1.34, -0.9],
-          [0, 1.26, -0.82],
+          [-1.18, 1.27, -0.68], // ventilator front
+          [-0.85, 1.13, -0.72], // natural droop
+          [-0.5, 1.1, -0.82], // belly beside the head
+          [-0.18, 1.36, -0.93], // rise up, approach from the head side
+          [-0.02, 1.43, -0.9], // arches over just above the mouth
+          [0.03, 1.28, -0.95], // tip curls down INTO the mouth (hidden inside)
         ]}
       />
 

@@ -1,34 +1,48 @@
 import { useEffect, useState } from 'react'
 import { useVitals } from '../../store/vitals.js'
-import { statusColor } from '../../lib/color.js'
 
 /**
- * VitalsBar — top strip with the live numeric vital signs.
+ * VitalsBar — the live numeric vitals strip.
  *
- * The store commits `current` ~12×/s, but we throttle the UI to ~4×/s here
- * to keep the digits readable and avoid unnecessary re-renders.
+ * Editorial premium look: each vital carries a small signature-colour dot and
+ * a calm near-white value; the value only turns amber/red when it leaves the
+ * safe range, so alarms read at a glance without visual noise.
  */
 const RANGES = {
-  hr: { low: 40, high: 130, warnLow: 55, warnHigh: 110 },
-  spo2: { low: 88, high: 101, warnLow: 92, warnHigh: 101 },
-  respRate: { low: 8, high: 28, warnLow: 10, warnHigh: 22 },
-  map: { low: 60, high: 110, warnLow: 65, warnHigh: 100 },
+  hr: { low: 45, high: 120, warnLow: 55, warnHigh: 110 },
+  spo2: { low: 90, high: 101, warnLow: 93, warnHigh: 101 },
+  respRate: { low: 8, high: 26, warnLow: 10, warnHigh: 22 },
+  map: { low: 62, high: 108, warnLow: 68, warnHigh: 100 },
 }
 
-function Tile({ label, value, unit, color, pulse }) {
+function level(v, r) {
+  if (!r) return 'ok'
+  if (v < r.low || v > r.high) return 'alarm'
+  if (v < r.warnLow || v > r.warnHigh) return 'warn'
+  return 'ok'
+}
+
+const LEVEL_COLOR = { ok: 'var(--text)', warn: 'var(--warn)', alarm: 'var(--alarm)' }
+
+function Vital({ dot, label, value, unit, range, pulse }) {
+  const lvl = level(value, range)
   return (
-    <div className="flex min-w-[92px] flex-col rounded-lg border border-slate-800 bg-slate-900/60 px-4 py-2">
-      <span className="text-[11px] uppercase tracking-wide text-slate-500">{label}</span>
-      <span
-        className="font-mono text-2xl font-bold tabular-nums leading-tight"
-        style={{ color, textShadow: `0 0 12px ${color}55` }}
-      >
-        {value}
-        <span className="ml-1 text-xs font-normal text-slate-500">{unit}</span>
-      </span>
-      {pulse && (
-        <span className="mt-0.5 h-0.5 w-full animate-pulse rounded-full" style={{ background: color }} />
-      )}
+    <div className="flex flex-col justify-center px-5 py-3 first:pl-6">
+      <div className="mb-1 flex items-center gap-1.5">
+        <span className={`h-1.5 w-1.5 rounded-full ${pulse ? 'live-dot' : ''}`} style={{ background: dot }} />
+        <span className="text-[10px] font-medium uppercase tracking-[0.16em]" style={{ color: 'var(--faint)' }}>
+          {label}
+        </span>
+      </div>
+      <div className="flex items-baseline gap-1.5">
+        <span
+          className="font-mono text-[27px] font-semibold leading-none tabular-nums"
+          style={{ color: LEVEL_COLOR[lvl] }}
+        >
+          {value}
+        </span>
+        <span className="text-[11px]" style={{ color: 'var(--faint)' }}>{unit}</span>
+      </div>
     </div>
   )
 }
@@ -49,12 +63,15 @@ export default function VitalsBar() {
   }, [])
 
   return (
-    <div className="flex flex-wrap gap-3 border-b border-slate-800 bg-slate-950 px-5 py-3">
-      <Tile label="HR" value={Math.round(v.hr)} unit="bpm" color={statusColor(v.hr, RANGES.hr)} pulse />
-      <Tile label="SpO₂" value={Math.round(v.spo2)} unit="%" color={statusColor(v.spo2, RANGES.spo2)} />
-      <Tile label="Resp" value={Math.round(v.respRate)} unit="/min" color={statusColor(v.respRate, RANGES.respRate)} />
-      <Tile label="VT" value={Math.round(v.tidalVolume)} unit="ml" color="#a78bfa" />
-      <Tile label="MAP" value={Math.round(v.map)} unit="mmHg" color={statusColor(v.map, RANGES.map)} />
+    <div
+      className="flex flex-wrap items-stretch [&>*+*]:border-l [&>*+*]:border-[color:var(--line)]"
+      style={{ background: 'var(--panel)', borderBottom: '1px solid var(--line)' }}
+    >
+      <Vital dot="#4ade80" label="Heart rate" value={Math.round(v.hr)} unit="bpm" range={RANGES.hr} pulse />
+      <Vital dot="#38bdf8" label="SpO₂" value={Math.round(v.spo2)} unit="%" range={RANGES.spo2} />
+      <Vital dot="#a5b4fc" label="Resp" value={Math.round(v.respRate)} unit="/min" range={RANGES.respRate} />
+      <Vital dot="#c4b5fd" label="Tidal vol" value={Math.round(v.tidalVolume)} unit="ml" />
+      <Vital dot="#f9a8d4" label="MAP" value={Math.round(v.map)} unit="mmHg" range={RANGES.map} />
     </div>
   )
 }
