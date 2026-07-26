@@ -18,7 +18,7 @@ the 3D patient turns cyanotic as saturation drops.
 ```bash
 npm install
 npm run dev        # http://localhost:5173
-npm run typecheck  # tsc -b (strict, no emit)
+npm run typecheck  # tsc -b
 npm run build      # tsc -b && vite build → dist/
 ```
 

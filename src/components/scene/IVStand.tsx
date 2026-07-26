@@ -1,6 +1,8 @@
 import { useMemo } from 'react'
 import { useGLTF } from '@react-three/drei'
+import { type ThreeElements } from '@react-three/fiber'
 import * as THREE from 'three'
+import { fitModel } from '@/lib/fitModel'
 
 /**
  * IVStand - IV pole + drip loaded from a GLB (embedded PBR, transmissive bag).
@@ -39,35 +41,26 @@ function keepHalf(geo: THREE.BufferGeometry, keepPositive: boolean): THREE.Buffe
   return out
 }
 
-export default function IVStand({ targetHeight = 2.4, keepPositive = true, ...props }) {
+export default function IVStand({
+  targetHeight = 2.4,
+  keepPositive = true,
+  ...props
+}: { targetHeight?: number; keepPositive?: boolean } & ThreeElements['group']) {
   const { scene } = useGLTF('/models/iv_pole.glb')
 
-  const fitted = useMemo(() => {
-    const o = scene.clone(true)
-
-    // Drop the second pole by keeping one half of the geometry.
-    o.traverse((m) => {
-      if (m instanceof THREE.Mesh) m.geometry = keepHalf(m.geometry, keepPositive)
-    })
-
-    // Auto-fit: scale to targetHeight (Y), center X/Z, base on the floor.
-    const box0 = new THREE.Box3().setFromObject(o)
-    const size0 = new THREE.Vector3()
-    box0.getSize(size0)
-    o.scale.setScalar(targetHeight / size0.y)
-    const box1 = new THREE.Box3().setFromObject(o)
-    const c = new THREE.Vector3()
-    box1.getCenter(c)
-    o.position.set(-c.x, -box1.min.y, -c.z)
-
-    o.traverse((m) => {
-      if (m instanceof THREE.Mesh) {
-        m.castShadow = true
-        m.receiveShadow = true
-      }
-    })
-    return o
-  }, [scene, targetHeight, keepPositive])
+  const fitted = useMemo(
+    () =>
+      fitModel(scene, {
+        axis: 'height',
+        target: targetHeight,
+        // Drop the second pole by keeping one half of the geometry.
+        preprocess: (o) =>
+          o.traverse((m) => {
+            if (m instanceof THREE.Mesh) m.geometry = keepHalf(m.geometry, keepPositive)
+          }),
+      }).object,
+    [scene, targetHeight, keepPositive],
+  )
 
   // Wrap in a group: the fitted object keeps its internal centering/floor
   // offset, and the scene's position/rotation apply to the group - so they

@@ -1,17 +1,12 @@
 import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { Text } from '@react-three/drei'
 import Trace from '@/components/scene/Trace'
+import ScreenText from '@/components/scene/ScreenText'
 import { simClock } from '@/store/simClock'
 import { useVitals } from '@/store/vitals'
-import { SCREEN_FONT } from '@/lib/font'
 import type { Vec3, TextMesh } from '@/types'
 
-/**
- * VentScreen - the ventilator's live screen (airway-pressure waveform + VT/RR
- * readouts), placed in world space so it can be aligned onto the model's
- * painted screen directly with `pos` / `rot` (intuitive world coordinates).
- */
+// Live airway-pressure + VT/RR screen, placed in world space onto the model.
 export default function VentScreen({
   pos = [0, 0, 0],
   rot = [0, 0, 0],
@@ -51,21 +46,21 @@ export default function VentScreen({
         color="#38bdf8"
         sampler={() => simClock.breath - 0.45}
       />
-      <Text font={SCREEN_FONT} position={[-w * 0.4, h * 0.36, 0.004]} fontSize={h * 0.09} color="#7dd3fc" anchorX="left">
+      <ScreenText position={[-w * 0.4, h * 0.36, 0.004]} fontSize={h * 0.09} color="#7dd3fc" anchorX="left">
         Paw
-      </Text>
-      <Text font={SCREEN_FONT} ref={vtRef} position={[-w * 0.36, -h * 0.16, 0.004]} fontSize={h * 0.22} color="#34d399" anchorX="left">
+      </ScreenText>
+      <ScreenText ref={vtRef} position={[-w * 0.36, -h * 0.16, 0.004]} fontSize={h * 0.22} color="#34d399" anchorX="left">
         500
-      </Text>
-      <Text font={SCREEN_FONT} position={[-w * 0.36, -h * 0.34, 0.004]} fontSize={h * 0.08} color="#6ee7b7" anchorX="left">
+      </ScreenText>
+      <ScreenText position={[-w * 0.36, -h * 0.34, 0.004]} fontSize={h * 0.08} color="#6ee7b7" anchorX="left">
         VT ml
-      </Text>
-      <Text font={SCREEN_FONT} ref={rrRef} position={[w * 0.08, -h * 0.16, 0.004]} fontSize={h * 0.22} color="#fbbf24" anchorX="left">
+      </ScreenText>
+      <ScreenText ref={rrRef} position={[w * 0.08, -h * 0.16, 0.004]} fontSize={h * 0.22} color="#fbbf24" anchorX="left">
         14
-      </Text>
-      <Text font={SCREEN_FONT} position={[w * 0.08, -h * 0.34, 0.004]} fontSize={h * 0.08} color="#fcd34d" anchorX="left">
+      </ScreenText>
+      <ScreenText position={[w * 0.08, -h * 0.34, 0.004]} fontSize={h * 0.08} color="#fcd34d" anchorX="left">
         RR /min
-      </Text>
+      </ScreenText>
     </group>
   )
 }

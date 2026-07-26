@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Analytics } from '@vercel/analytics/react'
-import ICUScene from '@/components/scene/ICUScene'
 import ControlPanel from '@/components/ui/ControlPanel'
 import VitalsBar from '@/components/ui/VitalsBar'
+
+const ICUScene = lazy(() => import('@/components/scene/ICUScene'))
 
 function Clock() {
   const [now, setNow] = useState(() => new Date())
@@ -57,7 +58,15 @@ export default function App() {
       {/* Scene + controls */}
       <main className="flex min-h-0 flex-1">
         <div className="relative min-w-0 flex-1">
-          <ICUScene />
+          <Suspense
+            fallback={
+              <div className="flex h-full items-center justify-center text-sm" style={{ color: 'var(--faint)' }}>
+                Loading scene…
+              </div>
+            }
+          >
+            <ICUScene />
+          </Suspense>
           <div
             className="pointer-events-none absolute bottom-3 left-3 rounded-full px-3 py-1 text-[11px]"
             style={{ background: 'rgba(10,13,17,0.6)', color: 'var(--faint)', backdropFilter: 'blur(6px)' }}

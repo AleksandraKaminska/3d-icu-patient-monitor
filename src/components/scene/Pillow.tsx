@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useGLTF } from '@react-three/drei'
-import * as THREE from 'three'
+import { fitModel } from '@/lib/fitModel'
 import type { Vec3 } from '@/types'
 
 /**
@@ -21,24 +21,11 @@ export default function Pillow({
 }) {
   const { scene } = useGLTF('/models/pillow.glb')
 
-  const fitted = useMemo(() => {
-    const o = scene.clone(true)
-    const box = new THREE.Box3().setFromObject(o)
-    const size = new THREE.Vector3()
-    box.getSize(size)
-    const center = new THREE.Vector3()
-    box.getCenter(center)
-    const s = targetWidth / size.x
-    o.scale.setScalar(s)
-    o.position.set(-center.x * s, -center.y * s, -center.z * s)
-    o.traverse((m) => {
-      if (m instanceof THREE.Mesh) {
-        m.castShadow = true
-        m.receiveShadow = true
-      }
-    })
-    return o
-  }, [scene, targetWidth])
+  // Centered on all axes (positioned by its center, not floored).
+  const fitted = useMemo(
+    () => fitModel(scene, { axis: 'width', target: targetWidth, floor: false }).object,
+    [scene, targetWidth],
+  )
 
   return (
     <group position={pos} rotation={rot}>

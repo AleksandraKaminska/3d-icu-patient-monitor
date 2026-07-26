@@ -1,5 +1,5 @@
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, Environment, ContactShadows } from '@react-three/drei'
+import { OrbitControls, ContactShadows } from '@react-three/drei'
 import { Suspense } from 'react'
 import Simulation from '@/components/scene/Simulation'
 import Room from '@/components/scene/Room'
@@ -28,8 +28,9 @@ export default function ICUScene() {
       <color attach="background" args={['#0a0d11']} />
       <fog attach="fog" args={['#0a0d11', 12, 26]} />
 
-      {/* Clinical lighting */}
+      {/* Hemisphere fill replaces an image-based Environment (no CDN fetch). */}
       <ambientLight intensity={0.35} />
+      <hemisphereLight args={['#cfe0ee', '#0a0d11', 0.5]} />
       <directionalLight
         position={[5, 8, 4]}
         intensity={1.1}
@@ -73,14 +74,7 @@ export default function ICUScene() {
         <IVStand position={[-1.25, 0, -0.6]} rotation={[0, Math.PI, 0]} />
         <Tubes />
 
-        <ContactShadows
-          position={[0, 0.01, 0]}
-          opacity={0.5}
-          scale={16}
-          blur={2.4}
-          far={6}
-        />
-        <Environment preset="city" />
+        <ContactShadows position={[0, 0.01, 0]} opacity={0.5} scale={16} blur={2.4} far={6} />
       </Suspense>
 
       <OrbitControls
