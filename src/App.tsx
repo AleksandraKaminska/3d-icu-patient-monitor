@@ -1,87 +1,54 @@
 import { Analytics } from '@vercel/analytics/react'
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense } from 'react'
 import ControlPanel from '@/components/ui/ControlPanel'
 import VitalsBar from '@/components/ui/VitalsBar'
 
 const ICUScene = lazy(() => import('@/components/scene/ICUScene'))
 
-function Clock() {
-  const [now, setNow] = useState(() => new Date())
-  useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 1000)
-    return () => clearInterval(id)
-  }, [])
-  const t = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-  return (
-    <span className="font-mono text-sm tabular-nums" style={{ color: 'var(--muted)' }}>
-      {t}
-    </span>
-  )
-}
-
 export default function App() {
   return (
-    <div
-      className="flex h-full w-full flex-col"
-      style={{ background: 'var(--bg)', color: 'var(--text)' }}
-    >
-      {/* Header */}
-      <header
-        className="z-10 flex items-center justify-between px-6 py-3.5"
-        style={{
-          background: 'var(--panel)',
-          borderBottom: '1px solid var(--line)',
-          boxShadow: 'var(--shadow-sm)',
-        }}
-      >
-        <div className="flex items-center gap-3">
-          <span
-            className="flex h-9 w-9 items-center justify-center rounded-xl"
-            style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}
-          >
-            <svg
-              aria-hidden="true"
-              width="19"
-              height="19"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M3 12h4l2 6 4-14 2 8h6" />
-            </svg>
-          </span>
-          <div className="leading-tight">
-            <h1 className="text-[15px] font-medium tracking-tight">3D ICU · Patient Monitor</h1>
-            <p className="text-xs" style={{ color: 'var(--faint)' }}>
-              Interactive intensive-care simulator
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-5">
-          <div className="hidden items-center gap-2 sm:flex">
+    <div className="flex h-full w-full" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
+      {/* Simulator column: header, vitals strip and the 3D scene */}
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header
+          className="z-10 flex items-center px-6 py-2.5"
+          style={{
+            background: 'var(--panel)',
+            borderBottom: '1px solid var(--line)',
+            boxShadow: 'var(--shadow-sm)',
+          }}
+        >
+          <div className="flex items-center gap-3">
             <span
-              className="h-1.5 w-1.5 rounded-full live-dot"
-              style={{ background: 'var(--accent)' }}
-            />
-            <span className="text-xs font-medium tracking-wide" style={{ color: 'var(--muted)' }}>
-              MONITORING
+              className="flex h-9 w-9 items-center justify-center rounded-xl"
+              style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}
+            >
+              <svg
+                aria-hidden="true"
+                width="19"
+                height="19"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M3 12h4l2 6 4-14 2 8h6" />
+              </svg>
             </span>
+            <div className="leading-tight">
+              <h1 className="text-[15px] font-medium tracking-tight">Intensive Care Monitor</h1>
+              <p className="text-xs" style={{ color: 'var(--faint)' }}>
+                Interactive intensive-care simulator
+              </p>
+            </div>
           </div>
-          <span className="hidden h-4 w-px sm:block" style={{ background: 'var(--line-2)' }} />
-          <Clock />
-        </div>
-      </header>
+        </header>
 
-      {/* Live vitals strip */}
-      <VitalsBar />
+        <VitalsBar />
 
-      {/* Scene + controls */}
-      <main className="flex min-h-0 flex-1">
-        <div className="relative min-w-0 flex-1">
+        <div className="relative min-h-0 flex-1">
           <Suspense
             fallback={
               <div
@@ -152,8 +119,10 @@ export default function App() {
             </a>
           </div>
         </div>
-        <ControlPanel />
-      </main>
+      </div>
+
+      {/* Full-height control sidebar - spans the whole window, above the header line */}
+      <ControlPanel />
 
       <Analytics />
     </div>

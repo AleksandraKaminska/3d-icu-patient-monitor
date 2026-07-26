@@ -1,5 +1,5 @@
 import { type ReactNode, useEffect, useState } from 'react'
-import type { Rhythm } from '@/lib/ecg'
+import { RHYTHMS, type Rhythm } from '@/lib/ecg'
 import { SCENARIOS, useVitals, type Vitals } from '@/store/vitals'
 
 /**
@@ -65,11 +65,7 @@ function Slider({
   )
 }
 
-const RHYTHMS: { key: Rhythm; label: string }[] = [
-  { key: 'sinus', label: 'Sinus' },
-  { key: 'af', label: 'Atrial fibrillation' },
-  { key: 'vt', label: 'Ventricular tachycardia' },
-]
+const RHYTHM_ORDER: Rhythm[] = ['sinus', 'af', 'aflutter', 'pvc', 'vt', 'vf', 'asystole', 'stemi']
 
 export default function ControlPanel() {
   const applyScenario = useVitals((s) => s.applyScenario)
@@ -91,7 +87,7 @@ export default function ControlPanel() {
 
   return (
     <aside
-      className="flex w-[336px] shrink-0 flex-col gap-7 overflow-y-auto p-6"
+      className="flex w-[336px] shrink-0 flex-col gap-7 overflow-y-auto px-6 pb-6 pt-4"
       style={{
         background: 'var(--panel)',
         borderLeft: '1px solid var(--line)',
@@ -140,7 +136,7 @@ export default function ControlPanel() {
       <section className="flex flex-col gap-3">
         <SectionTitle>ECG rhythm</SectionTitle>
         <div className="flex flex-col gap-1.5">
-          {RHYTHMS.map(({ key, label }) => {
+          {RHYTHM_ORDER.map((key) => {
             const active = rhythm === key
             return (
               <button
@@ -161,7 +157,7 @@ export default function ControlPanel() {
                   className="text-[13px] font-medium"
                   style={{ color: active ? 'var(--text)' : 'var(--muted)' }}
                 >
-                  {label}
+                  {RHYTHMS[key].label}
                 </span>
               </button>
             )

@@ -50,7 +50,13 @@ export default function VentScreen({
         rate={120}
         color="#38bdf8"
         screenColor="#061418"
-        sampler={() => simClock.breath - 0.45}
+        sampler={() => {
+          // Airway pressure: PEEP baseline, peak (PIP) scales with tidal volume.
+          const vt = useVitals.getState().current.tidalVolume
+          const peep = -0.6
+          const amp = 0.5 + 0.9 * Math.min(1, Math.max(0, (vt - 200) / 500))
+          return peep + amp * simClock.breath
+        }}
       />
       <ScreenText
         position={[-w * 0.46, h * 0.4, 0.004]}

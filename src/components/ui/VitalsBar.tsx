@@ -4,9 +4,8 @@ import { meanArterial, useVitals } from '@/store/vitals'
 /**
  * VitalsBar - the live numeric vitals strip.
  *
- * Editorial premium look: each vital carries a small signature-colour dot and
- * a calm near-white value; the value only turns amber/red when it leaves the
- * safe range, so alarms read at a glance without visual noise.
+ * Each vital shows a calm label and value; the value only turns amber/red when
+ * it leaves the safe range, so alarms read at a glance without visual noise.
  */
 const RANGES = {
   hr: { low: 45, high: 120, warnLow: 55, warnHigh: 110 },
@@ -33,38 +32,34 @@ const LEVEL_COLOR: Record<Level, string> = {
   alarm: 'var(--alarm)',
 }
 
+function Label({ children }: { children: string }) {
+  return (
+    <span
+      className="mb-1 text-[10px] font-semibold uppercase tracking-[0.16em]"
+      style={{ color: 'var(--muted)' }}
+    >
+      {children}
+    </span>
+  )
+}
+
 function Vital({
-  dot,
   label,
   value,
   display,
   unit,
   range,
-  pulse,
 }: {
-  dot: string
   label: string
   value: number
   display?: string // formatted text (e.g. one decimal); falls back to value
   unit: string
   range?: Range
-  pulse?: boolean
 }) {
   const lvl = level(value, range)
   return (
     <div className="flex flex-col justify-center px-5 py-3 first:pl-6">
-      <div className="mb-1 flex items-center gap-2">
-        <span
-          className={`h-2.5 w-2.5 rounded-full ${pulse ? 'live-dot' : ''}`}
-          style={{ background: dot, boxShadow: `0 0 0 3px ${dot}22` }}
-        />
-        <span
-          className="text-[10px] font-semibold uppercase tracking-[0.16em]"
-          style={{ color: 'var(--muted)' }}
-        >
-          {label}
-        </span>
-      </div>
+      <Label>{label}</Label>
       <div className="flex items-baseline gap-1.5">
         <span
           className="font-mono text-[27px] font-semibold leading-none tabular-nums"
@@ -87,18 +82,7 @@ function BpVital({ sys, dia, range }: { sys: number; dia: number; range?: Range 
   const lvl = level(map, range)
   return (
     <div className="flex flex-col justify-center px-5 py-3">
-      <div className="mb-1 flex items-center gap-2">
-        <span
-          className="h-2.5 w-2.5 rounded-full"
-          style={{ background: '#db2777', boxShadow: '0 0 0 3px #db277722' }}
-        />
-        <span
-          className="text-[10px] font-semibold uppercase tracking-[0.16em]"
-          style={{ color: 'var(--muted)' }}
-        >
-          Art. pressure
-        </span>
-      </div>
+      <Label>Art. pressure</Label>
       <div className="flex items-baseline gap-1.5">
         <span
           className="font-mono text-[27px] font-semibold leading-none tabular-nums"
@@ -138,31 +122,11 @@ export default function VitalsBar() {
         boxShadow: 'var(--shadow-sm)',
       }}
     >
+      <Vital label="Heart rate" value={Math.round(v.hr)} unit="bpm" range={RANGES.hr} />
+      <Vital label="SpO₂" value={Math.round(v.spo2)} unit="%" range={RANGES.spo2} />
+      <Vital label="Resp" value={Math.round(v.respRate)} unit="/min" range={RANGES.respRate} />
+      <Vital label="EtCO₂" value={Math.round(v.etco2)} unit="mmHg" range={RANGES.etco2} />
       <Vital
-        dot="#16a34a"
-        label="Heart rate"
-        value={Math.round(v.hr)}
-        unit="bpm"
-        range={RANGES.hr}
-        pulse
-      />
-      <Vital dot="#0891b2" label="SpO₂" value={Math.round(v.spo2)} unit="%" range={RANGES.spo2} />
-      <Vital
-        dot="#4f46e5"
-        label="Resp"
-        value={Math.round(v.respRate)}
-        unit="/min"
-        range={RANGES.respRate}
-      />
-      <Vital
-        dot="#ca8a04"
-        label="EtCO₂"
-        value={Math.round(v.etco2)}
-        unit="mmHg"
-        range={RANGES.etco2}
-      />
-      <Vital
-        dot="#ea580c"
         label="Temp"
         value={v.temp}
         display={v.temp.toFixed(1)}

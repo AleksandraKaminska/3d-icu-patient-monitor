@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { Rhythm } from '@/lib/ecg'
+import { RHYTHMS, type Rhythm } from '@/lib/ecg'
 
 /**
  * vitals - Global state of the patient's vital signs.
@@ -25,7 +25,7 @@ export function meanArterial(sys: number, dia: number): number {
   return dia + (sys - dia) / 3
 }
 
-type Scenario = Vitals & { label: string; desc: string }
+type Scenario = Vitals & { label: string; desc: string; rhythm?: Rhythm }
 
 export const SCENARIOS: Record<string, Scenario> = {
   stable: {
@@ -76,6 +76,56 @@ export const SCENARIOS: Record<string, Scenario> = {
     temp: 35.9,
     etco2: 48,
   },
+  sepsis: {
+    label: 'Sepsis',
+    desc: 'Septic shock - fever, tachycardia, hypotension and tachypnea.',
+    hr: 120,
+    spo2: 91,
+    respRate: 28,
+    tidalVolume: 480,
+    sys: 88,
+    dia: 48,
+    temp: 38.9,
+    etco2: 32,
+  },
+  hypovolemic: {
+    label: 'Hypovolemic shock',
+    desc: 'Haemorrhage/dehydration - tachycardia, hypotension, narrow pulse pressure.',
+    hr: 128,
+    spo2: 96,
+    respRate: 24,
+    tidalVolume: 460,
+    sys: 84,
+    dia: 62,
+    temp: 36.2,
+    etco2: 34,
+  },
+  stemi: {
+    label: 'STEMI (acute MI)',
+    desc: 'Acute myocardial infarction - ST-segment elevation on the ECG.',
+    hr: 96,
+    spo2: 95,
+    respRate: 20,
+    tidalVolume: 500,
+    sys: 138,
+    dia: 86,
+    temp: 36.8,
+    etco2: 37,
+    rhythm: 'stemi',
+  },
+  arrest: {
+    label: 'Cardiac arrest',
+    desc: 'Ventricular fibrillation with no cardiac output - no pulse, EtCO₂ collapses.',
+    hr: 0,
+    spo2: 0,
+    respRate: 12,
+    tidalVolume: 450,
+    sys: 0,
+    dia: 0,
+    temp: 35.5,
+    etco2: 10,
+    rhythm: 'vf',
+  },
 }
 
 const base = (s: Scenario): Vitals => ({
@@ -113,17 +163,34 @@ export const useVitals = create<VitalsState>((set) => ({
 
   setTarget: (patch) => set((s) => ({ target: { ...s.target, ...patch }, scenario: 'custom' })),
 
-  // Clinical scenarios are all sinus rhythms - reset rhythm on apply.
+  // A scenario carries its own rhythm (default sinus).
   applyScenario: (key) =>
-    set(() => ({ scenario: key, target: base(SCENARIOS[key]), rhythm: 'sinus' })),
+    set(() => ({
+      scenario: key,
+      target: base(SCENARIOS[key]),
+      rhythm: SCENARIOS[key].rhythm ?? 'sinus',
+    })),
 
-  // Switching rhythm nudges HR to a typical rate for that rhythm.
+  // Switching rhythm fits the vitals to it. A non-perfusing rhythm (VF/asystole)
+  // collapses circulation; switching back to a perfusing one restores it (ROSC).
   setRhythm: (r) =>
     set((s) => {
-      const target = { ...s.target }
-      if (r === 'vt') target.hr = 180
-      else if (r === 'af') target.hr = 130
-      return { rhythm: r, target, scenario: r === 'sinus' ? s.scenario : 'custom' }
+      const def = RHYTHMS[r]
+      const wasArrest = !RHYTHMS[s.rhythm].perfusing
+
+      let patch: Partial<Vitals>
+      if (!def.perfusing) {
+        patch = { hr: 0, sys: 0, dia: 0, spo2: 0, etco2: 8 }
+      } else {
+        patch = wasArrest ? { spo2: 95, sys: 110, dia: 68, etco2: 36 } : {}
+        patch.hr = def.restingHr ?? (wasArrest ? 90 : s.target.hr)
+      }
+
+      return {
+        rhythm: r,
+        target: { ...s.target, ...patch },
+        scenario: r === 'sinus' && !wasArrest ? s.scenario : 'custom',
+      }
     }),
 
   toggleMute: () => set((s) => ({ alarmsMuted: !s.alarmsMuted })),
