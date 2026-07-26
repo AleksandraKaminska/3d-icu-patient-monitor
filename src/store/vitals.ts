@@ -84,11 +84,9 @@ export const useVitals = create<VitalsState>((set) => ({
   scenario: 'stable',
   alarmsMuted: false,
 
-  setTarget: (patch) =>
-    set((s) => ({ target: { ...s.target, ...patch }, scenario: 'custom' })),
+  setTarget: (patch) => set((s) => ({ target: { ...s.target, ...patch }, scenario: 'custom' })),
 
-  applyScenario: (key) =>
-    set(() => ({ scenario: key, target: base(SCENARIOS[key]) })),
+  applyScenario: (key) => set(() => ({ scenario: key, target: base(SCENARIOS[key]) })),
 
   toggleMute: () => set((s) => ({ alarmsMuted: !s.alarmsMuted })),
 

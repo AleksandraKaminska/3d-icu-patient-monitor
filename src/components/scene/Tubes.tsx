@@ -27,16 +27,22 @@ function corrugatedTube(
   radialSegments: number,
 ) {
   const frames = curve.computeFrenetFrames(tubularSegments, false)
-  const positions: number[] = [], normals: number[] = [], indices: number[] = []
+  const positions: number[] = [],
+    normals: number[] = [],
+    indices: number[] = []
   const P = new THREE.Vector3()
   for (let i = 0; i <= tubularSegments; i++) {
     curve.getPointAt(i / tubularSegments, P)
-    const N = frames.normals[i], B = frames.binormals[i]
+    const N = frames.normals[i],
+      B = frames.binormals[i]
     const r = radius * (1 + 0.22 * Math.sin(i * 2.0)) // ribs
     for (let j = 0; j <= radialSegments; j++) {
       const v = (j / radialSegments) * Math.PI * 2
-      const s = Math.sin(v), c = -Math.cos(v)
-      const nx = c * N.x + s * B.x, ny = c * N.y + s * B.y, nz = c * N.z + s * B.z
+      const s = Math.sin(v),
+        c = -Math.cos(v)
+      const nx = c * N.x + s * B.x,
+        ny = c * N.y + s * B.y,
+        nz = c * N.z + s * B.z
       positions.push(P.x + r * nx, P.y + r * ny, P.z + r * nz)
       normals.push(nx, ny, nz)
     }

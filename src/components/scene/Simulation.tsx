@@ -1,8 +1,8 @@
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
-import { useVitals } from '@/store/vitals'
-import { simClock } from '@/store/simClock'
 import { beatPeriod } from '@/lib/ecg'
+import { simClock } from '@/store/simClock'
+import { useVitals } from '@/store/vitals'
 
 /**
  * Simulation - the heart of the simulation (no visual element).

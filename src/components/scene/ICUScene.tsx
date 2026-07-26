@@ -1,17 +1,17 @@
+import { ContactShadows, OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, ContactShadows } from '@react-three/drei'
 import { Suspense } from 'react'
-import Simulation from '@/components/scene/Simulation'
-import Room from '@/components/scene/Room'
 import Bed from '@/components/scene/Bed'
-import PatientModel from '@/components/scene/PatientModel'
-import Pillow from '@/components/scene/Pillow'
 import Cannula from '@/components/scene/Cannula'
 import Cardiomonitor from '@/components/scene/Cardiomonitor'
+import IVStand from '@/components/scene/IVStand'
+import PatientModel from '@/components/scene/PatientModel'
+import Pillow from '@/components/scene/Pillow'
+import Room from '@/components/scene/Room'
+import Simulation from '@/components/scene/Simulation'
+import Tubes from '@/components/scene/Tubes'
 import VentilatorModel from '@/components/scene/VentilatorModel'
 import VentScreen from '@/components/scene/VentScreen'
-import IVStand from '@/components/scene/IVStand'
-import Tubes from '@/components/scene/Tubes'
 
 /**
  * ICUScene - modular intensive-care room scene.
@@ -66,14 +66,25 @@ export default function ICUScene() {
             wrist + fingers direction). */}
         <Cannula pos={[-0.337, 1.135, -0.14]} rot={[0, 0, 0]} />
         <Cardiomonitor position={[1.6, 0, -0.7]} rotation={[0, Math.PI, 0]} targetHeight={1.9} />
-        <VentilatorModel targetHeight={1.7} position={[-1.45, 0, -1.15]} rotation={[0, -Math.PI / 2, 0]} />
+        <VentilatorModel
+          targetHeight={1.7}
+          position={[-1.45, 0, -1.15]}
+          rotation={[0, -Math.PI / 2, 0]}
+        />
         {/* Live ventilator screen, placed in world space onto the model's
             painted screen (tune pos/rot against a render). */}
         <VentScreen pos={[-1.47, 1.39, -1.13]} rot={[-0.33, 0, 0]} size={[0.26, 0.19]} />
         <IVStand position={[-1.25, 0, -0.6]} rotation={[0, Math.PI, 0]} />
         <Tubes />
 
-        <ContactShadows position={[0, 0.01, 0]} opacity={0.78} scale={16} blur={2} far={6} color="#334155" />
+        <ContactShadows
+          position={[0, 0.01, 0]}
+          opacity={0.78}
+          scale={16}
+          blur={2}
+          far={6}
+          color="#334155"
+        />
       </Suspense>
 
       <OrbitControls

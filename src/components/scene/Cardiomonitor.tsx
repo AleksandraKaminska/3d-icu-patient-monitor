@@ -1,8 +1,8 @@
-import { useMemo } from 'react'
 import { useGLTF } from '@react-three/drei'
-import { type ThreeElements } from '@react-three/fiber'
-import { fitModel } from '@/lib/fitModel'
+import type { ThreeElements } from '@react-three/fiber'
+import { useMemo } from 'react'
 import MonitorScreen from '@/components/scene/MonitorScreen'
+import { fitModel } from '@/lib/fitModel'
 import type { Vec3 } from '@/types'
 
 // Screen center in model space; the overlay faces model-local -Z (180° flip).

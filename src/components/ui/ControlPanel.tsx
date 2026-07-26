@@ -1,5 +1,5 @@
-import { useEffect, useState, type ReactNode } from 'react'
-import { useVitals, SCENARIOS, type Vitals } from '@/store/vitals'
+import { type ReactNode, useEffect, useState } from 'react'
+import { SCENARIOS, useVitals, type Vitals } from '@/store/vitals'
 
 /**
  * ControlPanel - clinical/editorial control panel.
@@ -9,7 +9,10 @@ import { useVitals, SCENARIOS, type Vitals } from '@/store/vitals'
 
 function SectionTitle({ children }: { children: ReactNode }) {
   return (
-    <h2 className="text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ color: 'var(--faint)' }}>
+    <h2
+      className="text-[10px] font-semibold uppercase tracking-[0.18em]"
+      style={{ color: 'var(--faint)' }}
+    >
       {children}
     </h2>
   )
@@ -36,10 +39,14 @@ function Slider({
   return (
     <label className="block">
       <div className="mb-2 flex items-baseline justify-between">
-        <span className="text-[13px]" style={{ color: 'var(--muted)' }}>{label}</span>
+        <span className="text-[13px]" style={{ color: 'var(--muted)' }}>
+          {label}
+        </span>
         <span className="font-mono text-[13px] tabular-nums" style={{ color: 'var(--text)' }}>
           {value}
-          <span className="ml-1" style={{ color: 'var(--faint)' }}>{unit}</span>
+          <span className="ml-1" style={{ color: 'var(--faint)' }}>
+            {unit}
+          </span>
         </span>
       </div>
       <input
@@ -76,7 +83,11 @@ export default function ControlPanel() {
   return (
     <aside
       className="flex w-[336px] shrink-0 flex-col gap-7 overflow-y-auto p-6"
-      style={{ background: 'var(--panel)', borderLeft: '1px solid var(--line)', boxShadow: '-1px 0 3px rgba(15,23,42,0.05)' }}
+      style={{
+        background: 'var(--panel)',
+        borderLeft: '1px solid var(--line)',
+        boxShadow: '-1px 0 3px rgba(15,23,42,0.05)',
+      }}
     >
       {/* Scenarios */}
       <section className="flex flex-col gap-3">
@@ -87,6 +98,7 @@ export default function ControlPanel() {
             return (
               <button
                 key={key}
+                type="button"
                 onClick={() => applyScenario(key)}
                 className="group flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-left transition"
                 style={{
@@ -120,11 +132,47 @@ export default function ControlPanel() {
       {/* Manual controls */}
       <section className="flex flex-col gap-5">
         <SectionTitle>Target vitals</SectionTitle>
-        <Slider label="Heart rate" unit="bpm" value={Math.round(t.hr)} min={30} max={180} onChange={(v) => update({ hr: v })} />
-        <Slider label="Saturation" unit="%" value={Math.round(t.spo2)} min={60} max={100} onChange={(v) => update({ spo2: v })} />
-        <Slider label="Respiratory rate" unit="/min" value={Math.round(t.respRate)} min={5} max={40} onChange={(v) => update({ respRate: v })} />
-        <Slider label="Tidal volume" unit="ml" value={Math.round(t.tidalVolume)} min={200} max={700} step={10} onChange={(v) => update({ tidalVolume: v })} />
-        <Slider label="Mean art. pressure" unit="mmHg" value={Math.round(t.map)} min={40} max={120} onChange={(v) => update({ map: v })} />
+        <Slider
+          label="Heart rate"
+          unit="bpm"
+          value={Math.round(t.hr)}
+          min={30}
+          max={180}
+          onChange={(v) => update({ hr: v })}
+        />
+        <Slider
+          label="Saturation"
+          unit="%"
+          value={Math.round(t.spo2)}
+          min={60}
+          max={100}
+          onChange={(v) => update({ spo2: v })}
+        />
+        <Slider
+          label="Respiratory rate"
+          unit="/min"
+          value={Math.round(t.respRate)}
+          min={5}
+          max={40}
+          onChange={(v) => update({ respRate: v })}
+        />
+        <Slider
+          label="Tidal volume"
+          unit="ml"
+          value={Math.round(t.tidalVolume)}
+          min={200}
+          max={700}
+          step={10}
+          onChange={(v) => update({ tidalVolume: v })}
+        />
+        <Slider
+          label="Mean art. pressure"
+          unit="mmHg"
+          value={Math.round(t.map)}
+          min={40}
+          max={120}
+          onChange={(v) => update({ map: v })}
+        />
       </section>
     </aside>
   )

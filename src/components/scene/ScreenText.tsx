@@ -1,5 +1,5 @@
-import { forwardRef, type ComponentPropsWithoutRef } from 'react'
 import { Text } from '@react-three/drei'
+import { type ComponentPropsWithoutRef, forwardRef } from 'react'
 import { SCREEN_FONT } from '@/lib/font'
 import type { TextMesh } from '@/types'
 

@@ -54,7 +54,10 @@ function Vital({
           className={`h-2.5 w-2.5 rounded-full ${pulse ? 'live-dot' : ''}`}
           style={{ background: dot, boxShadow: `0 0 0 3px ${dot}22` }}
         />
-        <span className="text-[10px] font-semibold uppercase tracking-[0.16em]" style={{ color: 'var(--muted)' }}>
+        <span
+          className="text-[10px] font-semibold uppercase tracking-[0.16em]"
+          style={{ color: 'var(--muted)' }}
+        >
           {label}
         </span>
       </div>
@@ -65,7 +68,9 @@ function Vital({
         >
           {value}
         </span>
-        <span className="text-[11px]" style={{ color: 'var(--faint)' }}>{unit}</span>
+        <span className="text-[11px]" style={{ color: 'var(--faint)' }}>
+          {unit}
+        </span>
       </div>
     </div>
   )
@@ -89,11 +94,28 @@ export default function VitalsBar() {
   return (
     <div
       className="flex flex-wrap items-stretch [&>*+*]:border-l [&>*+*]:border-[color:var(--line)]"
-      style={{ background: 'var(--panel)', borderBottom: '1px solid var(--line)', boxShadow: 'var(--shadow-sm)' }}
+      style={{
+        background: 'var(--panel)',
+        borderBottom: '1px solid var(--line)',
+        boxShadow: 'var(--shadow-sm)',
+      }}
     >
-      <Vital dot="#16a34a" label="Heart rate" value={Math.round(v.hr)} unit="bpm" range={RANGES.hr} pulse />
+      <Vital
+        dot="#16a34a"
+        label="Heart rate"
+        value={Math.round(v.hr)}
+        unit="bpm"
+        range={RANGES.hr}
+        pulse
+      />
       <Vital dot="#0891b2" label="SpO₂" value={Math.round(v.spo2)} unit="%" range={RANGES.spo2} />
-      <Vital dot="#4f46e5" label="Resp" value={Math.round(v.respRate)} unit="/min" range={RANGES.respRate} />
+      <Vital
+        dot="#4f46e5"
+        label="Resp"
+        value={Math.round(v.respRate)}
+        unit="/min"
+        range={RANGES.respRate}
+      />
       <Vital dot="#7c3aed" label="Tidal vol" value={Math.round(v.tidalVolume)} unit="ml" />
       <Vital dot="#db2777" label="MAP" value={Math.round(v.map)} unit="mmHg" range={RANGES.map} />
     </div>

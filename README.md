@@ -19,6 +19,8 @@ the 3D patient turns cyanotic as saturation drops.
 npm install
 npm run dev        # http://localhost:5173
 npm run typecheck  # tsc -b
+npm run lint       # biome check
+npm run format     # biome check --write (lint + format fixes)
 npm run build      # tsc -b && vite build → dist/
 ```
 

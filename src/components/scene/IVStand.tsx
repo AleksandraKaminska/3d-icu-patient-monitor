@@ -1,6 +1,6 @@
-import { useMemo } from 'react'
 import { useGLTF } from '@react-three/drei'
-import { type ThreeElements } from '@react-three/fiber'
+import type { ThreeElements } from '@react-three/fiber'
+import { useMemo } from 'react'
 import * as THREE from 'three'
 import { fitModel } from '@/lib/fitModel'
 
@@ -21,7 +21,9 @@ function keepHalf(geo: THREE.BufferGeometry, keepPositive: boolean): THREE.Buffe
   const pos = g.attributes.position
   const nor = g.attributes.normal
   const uv = g.attributes.uv
-  const P: number[] = [], N: number[] = [], U: number[] = []
+  const P: number[] = [],
+    N: number[] = [],
+    U: number[] = []
   for (let t = 0; t < pos.count; t += 3) {
     const cy = (pos.getY(t) + pos.getY(t + 1) + pos.getY(t + 2)) / 3
     if ((keepPositive && cy >= 0) || (!keepPositive && cy < 0)) {

@@ -1,11 +1,11 @@
-import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import Trace from '@/components/scene/Trace'
+import { useRef } from 'react'
 import ScreenText from '@/components/scene/ScreenText'
+import Trace from '@/components/scene/Trace'
+import { ecgSample, plethSample } from '@/lib/ecg'
 import { simClock } from '@/store/simClock'
 import { useVitals } from '@/store/vitals'
-import { ecgSample, plethSample } from '@/lib/ecg'
-import type { Vec3, TextMesh } from '@/types'
+import type { TextMesh, Vec3 } from '@/types'
 
 // Live ECG + SpO2 screen for the cardiomonitor.
 export default function MonitorScreen({
@@ -48,7 +48,12 @@ export default function MonitorScreen({
         samples={200}
         sampler={() => ecgSample(simClock.cardiacPhase, simClock.respPhase)}
       />
-      <ScreenText position={[-w * 0.44, h * 0.42, 0.006]} fontSize={h * 0.07} color="#22e08a" anchorX="left">
+      <ScreenText
+        position={[-w * 0.44, h * 0.42, 0.006]}
+        fontSize={h * 0.07}
+        color="#22e08a"
+        anchorX="left"
+      >
         II
       </ScreenText>
 
@@ -62,17 +67,39 @@ export default function MonitorScreen({
         sampler={() => plethSample(simClock.spo2Phase, useVitals.getState().current.spo2) - 0.4}
       />
 
-      <ScreenText ref={hrRef} position={[w * 0.24, -h * 0.32, 0.006]} fontSize={h * 0.2} color="#22e08a" anchorX="left">
+      <ScreenText
+        ref={hrRef}
+        position={[w * 0.24, -h * 0.32, 0.006]}
+        fontSize={h * 0.2}
+        color="#22e08a"
+        anchorX="left"
+      >
         74
       </ScreenText>
-      <ScreenText position={[w * 0.24, -h * 0.16, 0.006]} fontSize={h * 0.06} color="#4ade80" anchorX="left">
+      <ScreenText
+        position={[w * 0.24, -h * 0.16, 0.006]}
+        fontSize={h * 0.06}
+        color="#4ade80"
+        anchorX="left"
+      >
         HR
       </ScreenText>
 
-      <ScreenText ref={spo2Ref} position={[-w * 0.34, -h * 0.32, 0.006]} fontSize={h * 0.2} color="#22d3ee" anchorX="left">
+      <ScreenText
+        ref={spo2Ref}
+        position={[-w * 0.34, -h * 0.32, 0.006]}
+        fontSize={h * 0.2}
+        color="#22d3ee"
+        anchorX="left"
+      >
         98
       </ScreenText>
-      <ScreenText position={[-w * 0.34, -h * 0.16, 0.006]} fontSize={h * 0.06} color="#67e8f9" anchorX="left">
+      <ScreenText
+        position={[-w * 0.34, -h * 0.16, 0.006]}
+        fontSize={h * 0.06}
+        color="#67e8f9"
+        anchorX="left"
+      >
         SpO₂
       </ScreenText>
     </group>

@@ -1,5 +1,5 @@
-import { useMemo } from 'react'
 import { useGLTF } from '@react-three/drei'
+import { useMemo } from 'react'
 import { fitModel } from '@/lib/fitModel'
 import type { Vec3 } from '@/types'
 
