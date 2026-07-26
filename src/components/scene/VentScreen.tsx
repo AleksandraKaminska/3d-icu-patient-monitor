@@ -4,6 +4,7 @@ import { Text } from '@react-three/drei'
 import Trace from '@/components/scene/Trace'
 import { simClock } from '@/store/simClock'
 import { useVitals } from '@/store/vitals'
+import { SCREEN_FONT } from '@/lib/font'
 import type { Vec3, TextMesh } from '@/types'
 
 /**
@@ -50,19 +51,19 @@ export default function VentScreen({
         color="#38bdf8"
         sampler={() => simClock.breath - 0.45}
       />
-      <Text position={[-w * 0.4, h * 0.36, 0.004]} fontSize={h * 0.09} color="#7dd3fc" anchorX="left">
+      <Text font={SCREEN_FONT} position={[-w * 0.4, h * 0.36, 0.004]} fontSize={h * 0.09} color="#7dd3fc" anchorX="left">
         Paw
       </Text>
-      <Text ref={vtRef} position={[-w * 0.36, -h * 0.16, 0.004]} fontSize={h * 0.22} color="#34d399" anchorX="left">
+      <Text font={SCREEN_FONT} ref={vtRef} position={[-w * 0.36, -h * 0.16, 0.004]} fontSize={h * 0.22} color="#34d399" anchorX="left">
         500
       </Text>
-      <Text position={[-w * 0.36, -h * 0.34, 0.004]} fontSize={h * 0.08} color="#6ee7b7" anchorX="left">
+      <Text font={SCREEN_FONT} position={[-w * 0.36, -h * 0.34, 0.004]} fontSize={h * 0.08} color="#6ee7b7" anchorX="left">
         VT ml
       </Text>
-      <Text ref={rrRef} position={[w * 0.08, -h * 0.16, 0.004]} fontSize={h * 0.22} color="#fbbf24" anchorX="left">
+      <Text font={SCREEN_FONT} ref={rrRef} position={[w * 0.08, -h * 0.16, 0.004]} fontSize={h * 0.22} color="#fbbf24" anchorX="left">
         14
       </Text>
-      <Text position={[w * 0.08, -h * 0.34, 0.004]} fontSize={h * 0.08} color="#fcd34d" anchorX="left">
+      <Text font={SCREEN_FONT} position={[w * 0.08, -h * 0.34, 0.004]} fontSize={h * 0.08} color="#fcd34d" anchorX="left">
         RR /min
       </Text>
     </group>

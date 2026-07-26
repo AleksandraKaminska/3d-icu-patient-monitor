@@ -5,15 +5,12 @@ medical staff and a demonstration of real-time vital-sign monitoring. The ECG
 and SpO₂ waveforms are generated mathematically (no pre-recorded footage), and
 the 3D patient turns cyanotic as saturation drops.
 
-![react](https://img.shields.io/badge/React-19-61dafb) ![ts](https://img.shields.io/badge/TypeScript-strict-3178c6) ![r3f](https://img.shields.io/badge/React_Three_Fiber-9-black) ![tailwind](https://img.shields.io/badge/Tailwind-4-38bdf8)
-
 ![3D ICU Patient Monitor - screenshot](docs/screenshot.png)
 
 ## Stack
 
 - **React 19** + **TypeScript** + **Vite** - frontend
 - **React Three Fiber** + **drei** + **three.js** - 3D scene
-- **Tailwind CSS v4** - all UI outside the 3D scene
 - **Zustand** - vital-signs state
 
 ## Getting started
@@ -80,6 +77,13 @@ src/
 │       ├── VitalsBar.tsx       # top vitals strip
 │       └── ControlPanel.tsx    # scenarios + target-vitals sliders
 ```
+
+## Notes
+
+- GLB assets under `public/models/` are compressed with **meshopt** geometry +
+  **WebP** textures via `gltf-transform` - the
+  set went from ~40 MB to ~7.6 MB with no visible quality loss. drei's
+  `useGLTF` decodes meshopt out of the box, so no CDN decoder is needed.
 
 ## Credits (3D assets)
 

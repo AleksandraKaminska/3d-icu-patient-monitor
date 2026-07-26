@@ -6,6 +6,7 @@ import Trace from '@/components/scene/Trace'
 import { simClock } from '@/store/simClock'
 import { useVitals } from '@/store/vitals'
 import { ecgSample, plethSample } from '@/lib/ecg'
+import { SCREEN_FONT } from '@/lib/font'
 import type { Vec3, TextMesh } from '@/types'
 
 /**
@@ -99,7 +100,7 @@ export default function Cardiomonitor({
           samples={200}
           sampler={() => ecgSample(simClock.cardiacPhase, simClock.respPhase)}
         />
-        <Text position={[-w * 0.44, h * 0.42, 0.006]} fontSize={h * 0.07} color="#22e08a" anchorX="left">
+        <Text font={SCREEN_FONT} position={[-w * 0.44, h * 0.42, 0.006]} fontSize={h * 0.07} color="#22e08a" anchorX="left">
           II
         </Text>
 
@@ -115,18 +116,18 @@ export default function Cardiomonitor({
         />
 
         {/* HR digits */}
-        <Text ref={hrRef} position={[w * 0.24, -h * 0.32, 0.006]} fontSize={h * 0.2} color="#22e08a" anchorX="left">
+        <Text font={SCREEN_FONT} ref={hrRef} position={[w * 0.24, -h * 0.32, 0.006]} fontSize={h * 0.2} color="#22e08a" anchorX="left">
           74
         </Text>
-        <Text position={[w * 0.24, -h * 0.16, 0.006]} fontSize={h * 0.06} color="#4ade80" anchorX="left">
+        <Text font={SCREEN_FONT} position={[w * 0.24, -h * 0.16, 0.006]} fontSize={h * 0.06} color="#4ade80" anchorX="left">
           HR
         </Text>
 
         {/* SpO2 digits */}
-        <Text ref={spo2Ref} position={[-w * 0.34, -h * 0.32, 0.006]} fontSize={h * 0.2} color="#22d3ee" anchorX="left">
+        <Text font={SCREEN_FONT} ref={spo2Ref} position={[-w * 0.34, -h * 0.32, 0.006]} fontSize={h * 0.2} color="#22d3ee" anchorX="left">
           98
         </Text>
-        <Text position={[-w * 0.34, -h * 0.16, 0.006]} fontSize={h * 0.06} color="#67e8f9" anchorX="left">
+        <Text font={SCREEN_FONT} position={[-w * 0.34, -h * 0.16, 0.006]} fontSize={h * 0.06} color="#67e8f9" anchorX="left">
           SpO₂
         </Text>
       </group>
