@@ -76,7 +76,7 @@ export default function ControlPanel() {
   return (
     <aside
       className="flex w-[336px] shrink-0 flex-col gap-7 overflow-y-auto p-6"
-      style={{ background: 'var(--panel)', borderLeft: '1px solid var(--line)' }}
+      style={{ background: 'var(--panel)', borderLeft: '1px solid var(--line)', boxShadow: '-1px 0 3px rgba(15,23,42,0.05)' }}
     >
       {/* Scenarios */}
       <section className="flex flex-col gap-3">
@@ -125,25 +125,6 @@ export default function ControlPanel() {
         <Slider label="Respiratory rate" unit="/min" value={Math.round(t.respRate)} min={5} max={40} onChange={(v) => update({ respRate: v })} />
         <Slider label="Tidal volume" unit="ml" value={Math.round(t.tidalVolume)} min={200} max={700} step={10} onChange={(v) => update({ tidalVolume: v })} />
         <Slider label="Mean art. pressure" unit="mmHg" value={Math.round(t.map)} min={40} max={120} onChange={(v) => update({ map: v })} />
-      </section>
-
-      {/* Method note */}
-      <section className="mt-auto flex flex-col gap-2 pt-2">
-        <SectionTitle>Generated in code</SectionTitle>
-        <ul className="flex flex-col gap-1.5 text-[11px] leading-relaxed" style={{ color: 'var(--faint)' }}>
-          {[
-            'ECG - sum of Gaussian P-QRS-T waves',
-            'SpO₂ - plethysmograph from sine harmonics',
-            'Skin - cyanosis tint by saturation',
-            'IV drip - drop fall from a gravity vector',
-            'Tubes - Catmull-Rom splines in 3D',
-          ].map((line) => (
-            <li key={line} className="flex gap-2">
-              <span style={{ color: 'var(--accent)' }}>·</span>
-              <span>{line}</span>
-            </li>
-          ))}
-        </ul>
       </section>
     </aside>
   )

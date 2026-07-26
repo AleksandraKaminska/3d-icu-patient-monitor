@@ -26,22 +26,22 @@ npm run build      # tsc -b && vite build → dist/
 
 Equipment is a mix of GLB models (bed, IV pole, ventilator, heart monitor,
 patient, pillow) with **live data drawn procedurally on top** - every waveform,
-the cyanosis tint, the falling IV drop and every tube/cable is generated in
-code from the simulated vitals.
+the cyanosis tint and every tube/cable is generated in code from the simulated
+vitals.
 
 | Feature | Where | Math / medicine |
 | --- | --- | --- |
-| ECG waveform (P-QRS-T) | `lib/ecg.ts`, `scene/Trace.tsx`, `scene/Cardiomonitor.tsx` | Sum of Gaussian curves over the cycle phase; HR drives the period and "compresses" the wave |
+| ECG waveform (P-QRS-T) | `lib/ecg.ts`, `scene/Trace.tsx`, `scene/MonitorScreen.tsx` | Sum of Gaussian curves over the cycle phase; HR drives the period and "compresses" the wave |
 | SpO₂ pleth wave | `lib/ecg.ts` | Sine harmonics; amplitude weakens at low saturation |
 | Airway-pressure wave | `scene/VentScreen.tsx` | Live ventilator waveform driven by the breath phase |
 | Patient cyanosis | `scene/PatientModel.tsx` | Skin material tinted from pink → blue as SpO₂ drops |
-| IV drip | `scene/IVStand.tsx`, `scene/Cannula.tsx` | Drop fall integrated from the gravity vector (p = ½·g·t²) |
-| Tubes & cables | `scene/Tubes.tsx` | `CatmullRomCurve3` splines, a corrugated tube generator, gravity sag |
+| IV cannula | `scene/Cannula.tsx` | Procedural tape dressing + luer connector on the hand |
+| Tubes & cables | `scene/Tubes.tsx` | `CatmullRomCurve3` splines, a corrugated-tube generator, gravity sag |
+| Model auto-fit | `lib/fitModel.ts` | Clone → scale to target → center/floor; IV pole trimmed to one pole |
 | Simulation loop | `scene/Simulation.tsx` | Smooth easing of vitals toward targets (lerp), advancing heart/breath phases |
 
 Screen overlays (ECG/SpO₂ on the monitor, Paw on the ventilator) are computed
-onto each model's real screen; GLB models are auto-fitted (scaled/centered/
-floored) on load, and the two-pole IV model is trimmed to one pole in-code.
+onto each model's real screen.
 
 ## Controls
 
@@ -56,22 +56,25 @@ src/
 ├── App.tsx                     # layout: header + vitals strip + scene + panel
 ├── types.ts                    # shared types (Vec3, TextMesh)
 ├── lib/
-│   └── ecg.ts                  # ECG / SpO₂ waveform synthesis
+│   ├── ecg.ts                  # ECG / SpO₂ waveform synthesis
+│   ├── fitModel.ts             # shared GLB auto-fit
+│   └── font.ts                 # local screen font path
 ├── store/
 │   ├── vitals.ts               # vitals state (Zustand) + scenarios
 │   └── simClock.ts             # shared phases (mutated per frame, no re-render)
 ├── components/
 │   ├── scene/                  # 3D components (R3F)
-│   │   ├── ICUScene.tsx        # Canvas + lights + scene assembly
+│   │   ├── ICUScene.tsx        # Canvas + lights + scene assembly (lazy-loaded)
 │   │   ├── Simulation.tsx      # simulation driver (useFrame)
 │   │   ├── Room.tsx            # floor + walls
 │   │   ├── Bed.tsx             # hospital-bed GLB (auto-fit)
 │   │   ├── PatientModel.tsx    # rigged patient GLB + posing + SpO₂ tint
 │   │   ├── Pillow.tsx, Cannula.tsx
-│   │   ├── Cardiomonitor.tsx   # monitor GLB + live ECG/SpO₂ screen
+│   │   ├── Cardiomonitor.tsx   # monitor GLB + MonitorScreen
+│   │   ├── MonitorScreen.tsx   # live ECG/SpO₂ readout
 │   │   ├── VentilatorModel.tsx, VentScreen.tsx
-│   │   ├── IVStand.tsx         # IV-pole GLB (trimmed) + drip
-│   │   ├── Trace.tsx           # sweeping-cursor waveform
+│   │   ├── IVStand.tsx         # IV-pole GLB (trimmed to one pole)
+│   │   ├── Trace.tsx, ScreenText.tsx
 │   │   └── Tubes.tsx           # ET tube, ECG leads, IV line
 │   └── ui/                     # Tailwind UI
 │       ├── VitalsBar.tsx       # top vitals strip

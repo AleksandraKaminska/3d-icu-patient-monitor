@@ -22,18 +22,18 @@ export default function ICUScene() {
     <Canvas
       shadows
       dpr={[1, 2]}
-      camera={{ position: [4.2, 2.6, 4.8], fov: 45 }}
+      camera={{ position: [3.5, 2.3, 4.2], fov: 45 }}
       className="!absolute inset-0"
     >
-      <color attach="background" args={['#0a0d11']} />
-      <fog attach="fog" args={['#0a0d11', 12, 26]} />
+      <color attach="background" args={['#e9eef4']} />
+      <fog attach="fog" args={['#e9eef4', 14, 30]} />
 
-      {/* Hemisphere fill replaces an image-based Environment (no CDN fetch). */}
-      <ambientLight intensity={0.35} />
-      <hemisphereLight args={['#cfe0ee', '#0a0d11', 0.5]} />
+      {/* Bright clinical lighting; hemisphere fill (no CDN Environment). */}
+      <ambientLight intensity={0.5} />
+      <hemisphereLight args={['#ffffff', '#c4cdd8', 0.65]} />
       <directionalLight
         position={[5, 8, 4]}
-        intensity={1.1}
+        intensity={1.6}
         castShadow
         shadow-mapSize={[2048, 2048]}
         shadow-camera-far={30}
@@ -42,7 +42,6 @@ export default function ICUScene() {
         shadow-camera-top={10}
         shadow-camera-bottom={-10}
       />
-      <pointLight position={[-4, 3, -2]} intensity={20} color="#3b82f6" distance={12} />
 
       <Suspense fallback={null}>
         {/* Simulation driver - no visual element */}
@@ -74,11 +73,11 @@ export default function ICUScene() {
         <IVStand position={[-1.25, 0, -0.6]} rotation={[0, Math.PI, 0]} />
         <Tubes />
 
-        <ContactShadows position={[0, 0.01, 0]} opacity={0.5} scale={16} blur={2.4} far={6} />
+        <ContactShadows position={[0, 0.01, 0]} opacity={0.78} scale={16} blur={2} far={6} color="#334155" />
       </Suspense>
 
       <OrbitControls
-        target={[0, 1, 0]}
+        target={[0, 0.95, -0.05]}
         minDistance={3}
         maxDistance={12}
         maxPolarAngle={Math.PI / 2.05}

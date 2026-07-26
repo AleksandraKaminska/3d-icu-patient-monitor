@@ -49,9 +49,12 @@ function Vital({
   const lvl = level(value, range)
   return (
     <div className="flex flex-col justify-center px-5 py-3 first:pl-6">
-      <div className="mb-1 flex items-center gap-1.5">
-        <span className={`h-1.5 w-1.5 rounded-full ${pulse ? 'live-dot' : ''}`} style={{ background: dot }} />
-        <span className="text-[10px] font-medium uppercase tracking-[0.16em]" style={{ color: 'var(--faint)' }}>
+      <div className="mb-1 flex items-center gap-2">
+        <span
+          className={`h-2.5 w-2.5 rounded-full ${pulse ? 'live-dot' : ''}`}
+          style={{ background: dot, boxShadow: `0 0 0 3px ${dot}22` }}
+        />
+        <span className="text-[10px] font-semibold uppercase tracking-[0.16em]" style={{ color: 'var(--muted)' }}>
           {label}
         </span>
       </div>
@@ -86,13 +89,13 @@ export default function VitalsBar() {
   return (
     <div
       className="flex flex-wrap items-stretch [&>*+*]:border-l [&>*+*]:border-[color:var(--line)]"
-      style={{ background: 'var(--panel)', borderBottom: '1px solid var(--line)' }}
+      style={{ background: 'var(--panel)', borderBottom: '1px solid var(--line)', boxShadow: 'var(--shadow-sm)' }}
     >
-      <Vital dot="#4ade80" label="Heart rate" value={Math.round(v.hr)} unit="bpm" range={RANGES.hr} pulse />
-      <Vital dot="#38bdf8" label="SpO₂" value={Math.round(v.spo2)} unit="%" range={RANGES.spo2} />
-      <Vital dot="#a5b4fc" label="Resp" value={Math.round(v.respRate)} unit="/min" range={RANGES.respRate} />
-      <Vital dot="#c4b5fd" label="Tidal vol" value={Math.round(v.tidalVolume)} unit="ml" />
-      <Vital dot="#f9a8d4" label="MAP" value={Math.round(v.map)} unit="mmHg" range={RANGES.map} />
+      <Vital dot="#16a34a" label="Heart rate" value={Math.round(v.hr)} unit="bpm" range={RANGES.hr} pulse />
+      <Vital dot="#0891b2" label="SpO₂" value={Math.round(v.spo2)} unit="%" range={RANGES.spo2} />
+      <Vital dot="#4f46e5" label="Resp" value={Math.round(v.respRate)} unit="/min" range={RANGES.respRate} />
+      <Vital dot="#7c3aed" label="Tidal vol" value={Math.round(v.tidalVolume)} unit="ml" />
+      <Vital dot="#db2777" label="MAP" value={Math.round(v.map)} unit="mmHg" range={RANGES.map} />
     </div>
   )
 }
