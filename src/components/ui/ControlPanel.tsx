@@ -1,4 +1,5 @@
 import { type ReactNode, useEffect, useState } from 'react'
+import type { Rhythm } from '@/lib/ecg'
 import { SCENARIOS, useVitals, type Vitals } from '@/store/vitals'
 
 /**
@@ -64,10 +65,18 @@ function Slider({
   )
 }
 
+const RHYTHMS: { key: Rhythm; label: string }[] = [
+  { key: 'sinus', label: 'Sinus' },
+  { key: 'af', label: 'Atrial fibrillation' },
+  { key: 'vt', label: 'Ventricular tachycardia' },
+]
+
 export default function ControlPanel() {
   const applyScenario = useVitals((s) => s.applyScenario)
   const setTarget = useVitals((s) => s.setTarget)
   const scenario = useVitals((s) => s.scenario)
+  const rhythm = useVitals((s) => s.rhythm)
+  const setRhythm = useVitals((s) => s.setRhythm)
   const [t, setT] = useState(() => useVitals.getState().target)
 
   useEffect(() => {
@@ -127,6 +136,39 @@ export default function ControlPanel() {
         </p>
       </section>
 
+      {/* ECG rhythm */}
+      <section className="flex flex-col gap-3">
+        <SectionTitle>ECG rhythm</SectionTitle>
+        <div className="flex flex-col gap-1.5">
+          {RHYTHMS.map(({ key, label }) => {
+            const active = rhythm === key
+            return (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setRhythm(key)}
+                className="group flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-left transition"
+                style={{
+                  background: active ? 'var(--accent-soft)' : 'transparent',
+                  border: `1px solid ${active ? 'rgba(53,208,186,0.35)' : 'var(--line)'}`,
+                }}
+              >
+                <span
+                  className="h-1.5 w-1.5 shrink-0 rounded-full transition"
+                  style={{ background: active ? 'var(--accent)' : 'var(--faint)' }}
+                />
+                <span
+                  className="text-[13px] font-medium"
+                  style={{ color: active ? 'var(--text)' : 'var(--muted)' }}
+                >
+                  {label}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      </section>
+
       <div style={{ height: 1, background: 'var(--line)' }} />
 
       {/* Manual controls */}
@@ -166,12 +208,37 @@ export default function ControlPanel() {
           onChange={(v) => update({ tidalVolume: v })}
         />
         <Slider
-          label="Mean art. pressure"
+          label="Systolic pressure"
           unit="mmHg"
-          value={Math.round(t.map)}
+          value={Math.round(t.sys)}
+          min={70}
+          max={200}
+          onChange={(v) => update({ sys: v })}
+        />
+        <Slider
+          label="Diastolic pressure"
+          unit="mmHg"
+          value={Math.round(t.dia)}
           min={40}
           max={120}
-          onChange={(v) => update({ map: v })}
+          onChange={(v) => update({ dia: v })}
+        />
+        <Slider
+          label="Temperature"
+          unit="°C"
+          value={Number(t.temp.toFixed(1))}
+          min={34}
+          max={41}
+          step={0.1}
+          onChange={(v) => update({ temp: v })}
+        />
+        <Slider
+          label="EtCO₂"
+          unit="mmHg"
+          value={Math.round(t.etco2)}
+          min={20}
+          max={70}
+          onChange={(v) => update({ etco2: v })}
         />
       </section>
     </aside>

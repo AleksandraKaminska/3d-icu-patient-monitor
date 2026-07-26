@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import type { Rhythm } from '@/lib/ecg'
 
 /**
  * vitals - Global state of the patient's vital signs.
@@ -13,7 +14,15 @@ export type Vitals = {
   spo2: number
   respRate: number
   tidalVolume: number
-  map: number
+  sys: number // systolic pressure (mmHg)
+  dia: number // diastolic pressure (mmHg)
+  temp: number // body temperature (°C)
+  etco2: number // end-tidal CO₂ (mmHg)
+}
+
+// Mean arterial pressure - derived, not set directly: MAP ≈ DIA + (SYS - DIA)/3.
+export function meanArterial(sys: number, dia: number): number {
+  return dia + (sys - dia) / 3
 }
 
 type Scenario = Vitals & { label: string; desc: string }
@@ -26,7 +35,10 @@ export const SCENARIOS: Record<string, Scenario> = {
     spo2: 98,
     respRate: 14,
     tidalVolume: 500,
-    map: 88,
+    sys: 118,
+    dia: 73,
+    temp: 36.8,
+    etco2: 38,
   },
   desaturation: {
     label: 'Desaturation',
@@ -35,7 +47,10 @@ export const SCENARIOS: Record<string, Scenario> = {
     spo2: 79,
     respRate: 26,
     tidalVolume: 380,
-    map: 72,
+    sys: 100,
+    dia: 58,
+    temp: 37.4,
+    etco2: 30,
   },
   tachycardia: {
     label: 'Tachycardia',
@@ -44,7 +59,10 @@ export const SCENARIOS: Record<string, Scenario> = {
     spo2: 94,
     respRate: 22,
     tidalVolume: 460,
-    map: 68,
+    sys: 98,
+    dia: 53,
+    temp: 38.4,
+    etco2: 41,
   },
   bradycardia: {
     label: 'Bradycardia',
@@ -53,7 +71,10 @@ export const SCENARIOS: Record<string, Scenario> = {
     spo2: 95,
     respRate: 10,
     tidalVolume: 520,
-    map: 62,
+    sys: 90,
+    dia: 48,
+    temp: 35.9,
+    etco2: 48,
   },
 }
 
@@ -62,16 +83,21 @@ const base = (s: Scenario): Vitals => ({
   spo2: s.spo2,
   respRate: s.respRate,
   tidalVolume: s.tidalVolume,
-  map: s.map,
+  sys: s.sys,
+  dia: s.dia,
+  temp: s.temp,
+  etco2: s.etco2,
 })
 
 export type VitalsState = {
   target: Vitals
   current: Vitals
   scenario: string
+  rhythm: Rhythm
   alarmsMuted: boolean
   setTarget: (patch: Partial<Vitals>) => void
   applyScenario: (key: string) => void
+  setRhythm: (r: Rhythm) => void
   toggleMute: () => void
   commitCurrent: (next: Partial<Vitals>) => void
 }
@@ -82,11 +108,23 @@ export const useVitals = create<VitalsState>((set) => ({
   // Current values (ease toward target - updated in useFrame)
   current: base(SCENARIOS.stable),
   scenario: 'stable',
+  rhythm: 'sinus',
   alarmsMuted: false,
 
   setTarget: (patch) => set((s) => ({ target: { ...s.target, ...patch }, scenario: 'custom' })),
 
-  applyScenario: (key) => set(() => ({ scenario: key, target: base(SCENARIOS[key]) })),
+  // Clinical scenarios are all sinus rhythms - reset rhythm on apply.
+  applyScenario: (key) =>
+    set(() => ({ scenario: key, target: base(SCENARIOS[key]), rhythm: 'sinus' })),
+
+  // Switching rhythm nudges HR to a typical rate for that rhythm.
+  setRhythm: (r) =>
+    set((s) => {
+      const target = { ...s.target }
+      if (r === 'vt') target.hr = 180
+      else if (r === 'af') target.hr = 130
+      return { rhythm: r, target, scenario: r === 'sinus' ? s.scenario : 'custom' }
+    }),
 
   toggleMute: () => set((s) => ({ alarmsMuted: !s.alarmsMuted })),
 

@@ -1,8 +1,7 @@
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
-import { beatPeriod } from '@/lib/ecg'
 import { simClock } from '@/store/simClock'
-import { useVitals } from '@/store/vitals'
+import { meanArterial, useVitals } from '@/store/vitals'
 
 /**
  * Simulation - the heart of the simulation (no visual element).
@@ -26,14 +25,14 @@ export default function Simulation() {
       spo2: THREE.MathUtils.lerp(current.spo2, target.spo2, k),
       respRate: THREE.MathUtils.lerp(current.respRate, target.respRate, k),
       tidalVolume: THREE.MathUtils.lerp(current.tidalVolume, target.tidalVolume, k),
-      map: THREE.MathUtils.lerp(current.map, target.map, k),
+      sys: THREE.MathUtils.lerp(current.sys, target.sys, k),
+      dia: THREE.MathUtils.lerp(current.dia, target.dia, k),
+      temp: THREE.MathUtils.lerp(current.temp, target.temp, k),
+      etco2: THREE.MathUtils.lerp(current.etco2, target.etco2, k),
     }
 
-    // 2. Advance phases. Cardiac phase grows by delta / beat_period.
-    const period = beatPeriod(next.hr)
-    simClock.cardiacPhase = (simClock.cardiacPhase + delta / period) % 1
-    simClock.spo2Phase = simClock.cardiacPhase // pulse wave synced to the heart
-
+    // 2. Advance phases. The cardiac phase is integrated per sample inside the
+    // ECG/pleth traces (from HR) so the narrow QRS can't alias to the frame rate.
     // Breathing: respRate breaths/min -> period in seconds.
     const respPeriod = 60 / Math.max(1, next.respRate)
     simClock.respPhase = (simClock.respPhase + (delta / respPeriod) * Math.PI * 2) % (Math.PI * 2)
@@ -41,7 +40,7 @@ export default function Simulation() {
     simClock.breath = (Math.sin(simClock.respPhase - Math.PI / 2) + 1) / 2
 
     // IV drop: rate depends on MAP (pressure) - faster when lower.
-    const dripRate = 0.6 + (90 - next.map) * 0.02
+    const dripRate = 0.6 + (90 - meanArterial(next.sys, next.dia)) * 0.02
     simClock.dripT = (simClock.dripT + delta * dripRate) % 1
 
     // 3. Commit to the store ~12 times/s (smooth enough for digits, cheap for React).

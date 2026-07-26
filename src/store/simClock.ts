@@ -7,9 +7,7 @@
  * in useFrame, and the other 3D components read them without re-rendering.
  */
 export const simClock = {
-  cardiacPhase: 0, // 0..1 - phase of the cardiac cycle
   respPhase: 0, // 0..2π - respiratory phase
   breath: 0, // 0..1 - degree of inhalation (drives chest/piston motion)
   dripT: 0, // 0..1 - progress of the falling IV drop
-  spo2Phase: 0, // 0..1 - phase of the plethysmograph wave
 }

@@ -33,9 +33,12 @@ vitals.
 
 | Feature | Where | Math / medicine |
 | --- | --- | --- |
-| ECG waveform (P-QRS-T) | `lib/ecg.ts`, `scene/Trace.tsx`, `scene/MonitorScreen.tsx` | Sum of Gaussian curves over the cycle phase; HR drives the period and "compresses" the wave |
+| ECG waveform (lead II) | `lib/ecg.ts`, `scene/Trace.tsx`, `scene/MonitorScreen.tsx` | P-QRS-T from timed Gaussian waves at real millisecond offsets; QRS keeps a constant width while diastole scales with HR, QT via Bazett. Drawn in **sweep mode** with a moving erase bar like a real bedside monitor |
+| ECG rhythms | `lib/ecg.ts`, `store/vitals.ts` | Selectable **sinus**, **atrial fibrillation** (irregularly-irregular RR, no P, fibrillatory baseline — the pulse follows), **ventricular tachycardia** (wide monomorphic complexes, fast) |
 | SpO₂ pleth wave | `lib/ecg.ts` | Sine harmonics; amplitude weakens at low saturation |
+| Blood pressure | `store/vitals.ts`, `ui/VitalsBar.tsx` | Systolic/diastolic set directly; MAP is derived - `DIA + (SYS − DIA) / 3` - and shown as `118/73 (88)` |
 | Airway-pressure wave | `scene/VentScreen.tsx` | Live ventilator waveform driven by the breath phase |
+| Capnography (EtCO₂) | `lib/ecg.ts`, `scene/VentScreen.tsx` | Capnogram - phase II upstroke, phase III alveolar plateau scaled by EtCO₂, sharp drop at inspiration |
 | Patient cyanosis | `scene/PatientModel.tsx` | Skin material tinted from pink → blue as SpO₂ drops |
 | IV cannula | `scene/Cannula.tsx` | Procedural tape dressing + luer connector on the hand |
 | Tubes & cables | `scene/Tubes.tsx` | `CatmullRomCurve3` splines, a corrugated-tube generator, gravity sag |
@@ -48,7 +51,8 @@ onto each model's real screen.
 ## Controls
 
 - **Right-hand panel** - pick a clinical scenario (stable, desaturation,
-  tachycardia, bradycardia) or set vitals manually with the sliders.
+  tachycardia, bradycardia), switch the **ECG rhythm** (sinus / AF / VT), or set
+  vitals manually with the sliders.
 - **3D scene** - drag to orbit the camera; scroll to zoom.
 
 ## Structure
