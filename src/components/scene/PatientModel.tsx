@@ -2,16 +2,17 @@ import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
-import { useVitals } from '../../store/vitals.js'
+import { useVitals } from '@/store/vitals'
+import type { Vec3 } from '@/types'
 
 // Reused scratch color for the per-frame SpO2 tint.
 const _tint = new THREE.Color()
 
 /**
- * PatientModel — patient loaded from a rigged GLB (Tripo, meshopt).
+ * PatientModel - patient loaded from a rigged GLB (Tripo, meshopt).
  *
  * The mesh is skinned, so we do NOT clone it (cloning breaks the skeleton
- * binding) — we scale/center it via wrapping groups. The model ships in a
+ * binding) - we scale/center it via wrapping groups. The model ships in a
  * T-pose, so we rotate the upper-arm bones to bring the arms down along the
  * body. Bone deltas are applied relative to the captured bind pose, so tuning
  * the angles never accumulates.
@@ -23,36 +24,50 @@ export default function PatientModel({
   rollRot = [0, 0, Math.PI / 2], // outer: roll from side onto the back
   lUpperarm = [0, 0, -1.4], // arm-down (relative to bind pose)
   rUpperarm = [0, 0, 1.4],
-  // Gentle pronation split between forearm and wrist (+Y bone axis) — palms
+  // Gentle pronation split between forearm and wrist (+Y bone axis) - palms
   // angle toward the mattress without over-twisting the joints.
   lForearm = [0, 0.42, 0],
   rForearm = [0, -0.42, 0],
   lHand = [0, 0.42, 0],
   rHand = [0, -0.42, 0],
   neck = [0.4, 0, 0], // flex the neck to lift the head onto the pillow
+}: {
+  targetLength?: number
+  pos?: Vec3
+  layRot?: Vec3
+  rollRot?: Vec3
+  lUpperarm?: Vec3
+  rUpperarm?: Vec3
+  lForearm?: Vec3
+  rForearm?: Vec3
+  lHand?: Vec3
+  rHand?: Vec3
+  neck?: Vec3
 }) {
   const { scene } = useGLTF('/models/patient.glb')
-  const materials = useRef([])
+  const materials = useRef<THREE.MeshStandardMaterial[]>([])
 
   const { scale, offset } = useMemo(() => {
-    // Bounds measured offline — Box3.setFromObject is unreliable on skinned
+    // Bounds measured offline - Box3.setFromObject is unreliable on skinned
     // meshes (it can include the skeleton), which throws off scale/centering.
     const SIZE = [0.18, 0.99, 1.0]
     const CENTER = [0, 0.495, 0]
     const s = targetLength / Math.max(...SIZE)
-    const mats = []
+    const mats: THREE.MeshStandardMaterial[] = []
     scene.traverse((m) => {
-      if (m.isMesh || m.isSkinnedMesh) {
+      if (m instanceof THREE.Mesh) {
         m.castShadow = true
         m.receiveShadow = true
         m.frustumCulled = false
-        for (const mat of Array.isArray(m.material) ? m.material : [m.material]) {
-          if (mat) mats.push(mat)
+        const list = Array.isArray(m.material) ? m.material : [m.material]
+        for (const mat of list) {
+          if (mat instanceof THREE.MeshStandardMaterial) mats.push(mat)
         }
       }
     })
     materials.current = mats
-    return { scale: s, offset: [-CENTER[0] * s, -CENTER[1] * s, -CENTER[2] * s] }
+    const offset: Vec3 = [-CENTER[0] * s, -CENTER[1] * s, -CENTER[2] * s]
+    return { scale: s, offset }
   }, [scene, targetLength])
 
   // SpO2 heatmap: multiply the skin texture by a tint that goes bluish
@@ -67,7 +82,7 @@ export default function PatientModel({
 
   // Pose the arms: rotate the upper-arm bones relative to their bind pose.
   useMemo(() => {
-    const pose = (name, e) => {
+    const pose = (name: string, e: Vec3) => {
       const bone = scene.getObjectByName(name)
       if (!bone) return
       if (!bone.userData.bindQuat) bone.userData.bindQuat = bone.quaternion.clone()

@@ -1,46 +1,33 @@
 import { useMemo } from 'react'
 import * as THREE from 'three'
+import type { Vec3 } from '@/types'
 
 /**
- * Tubes — tubes and cables generated dynamically in 3D as Catmull-Rom splines.
+ * Tubes - tubes and cables generated dynamically in 3D as Catmull-Rom splines.
  *
- * Intubation tube, monitor leads, and the IV line are not straight segments —
+ * Intubation tube, monitor leads, and the IV line are not straight segments -
  * we define control points in space and let CatmullRomCurve3 interpolate a
  * smooth curve, then wrap it in a TubeGeometry. The control points are kept
  * above the mattress plane (y > BED_TOP), a simple point-plane check so the
  * tubes drape naturally instead of passing through the bed.
  */
 
-const BED_TOP = 1.12 // mattress top plane — control points must stay above it
+const BED_TOP = 1.12 // mattress top plane - control points must stay above it
 
 // Point-plane guard: lift any point that would sink below the bed.
-function clampAboveBed(p, margin = 0.02) {
+function clampAboveBed(p: Vec3, margin = 0.02) {
   return new THREE.Vector3(p[0], Math.max(p[1], BED_TOP + margin), p[2])
 }
 
-/**
- * Sagging line between two points — samples a straight interpolation and
- * subtracts a parabolic droop (0 at the ends, deepest in the middle), so a
- * flexible tube hangs under gravity like a real IV line instead of running
- * straight. `sag` is the maximum dip; `n` the number of samples.
- */
-function saggingLine(start, end, sag = 0.4, n = 12) {
-  const pts = []
-  for (let i = 0; i <= n; i++) {
-    const t = i / n
-    pts.push([
-      THREE.MathUtils.lerp(start[0], end[0], t),
-      THREE.MathUtils.lerp(start[1], end[1], t) - sag * 4 * t * (1 - t),
-      THREE.MathUtils.lerp(start[2], end[2], t),
-    ])
-  }
-  return pts
-}
-
 // Build a corrugated (ribbed) tube along a curve by modulating the radius.
-function corrugatedTube(curve, tubularSegments, radius, radialSegments) {
+function corrugatedTube(
+  curve: THREE.CatmullRomCurve3,
+  tubularSegments: number,
+  radius: number,
+  radialSegments: number,
+) {
   const frames = curve.computeFrenetFrames(tubularSegments, false)
-  const positions = [], normals = [], indices = []
+  const positions: number[] = [], normals: number[] = [], indices: number[] = []
   const P = new THREE.Vector3()
   for (let i = 0; i <= tubularSegments; i++) {
     curve.getPointAt(i / tubularSegments, P)
@@ -70,7 +57,21 @@ function corrugatedTube(curve, tubularSegments, radius, radialSegments) {
   return g
 }
 
-function Tube({ points, radius = 0.02, color = '#e2e8f0', opacity = 1, clamp = true, corrugated = false }) {
+function Tube({
+  points,
+  radius = 0.02,
+  color = '#e2e8f0',
+  opacity = 1,
+  clamp = true,
+  corrugated = false,
+}: {
+  points: Vec3[]
+  radius?: number
+  color?: string
+  opacity?: number
+  clamp?: boolean
+  corrugated?: boolean
+}) {
   const geometry = useMemo(() => {
     const pts = points.map((p) => (clamp ? clampAboveBed(p) : new THREE.Vector3(...p)))
     const curve = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.5)

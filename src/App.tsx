@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import ICUScene from './components/scene/ICUScene.jsx'
-import ControlPanel from './components/ui/ControlPanel.jsx'
-import VitalsBar from './components/ui/VitalsBar.jsx'
+import { Analytics } from '@vercel/analytics/react'
+import ICUScene from '@/components/scene/ICUScene'
+import ControlPanel from '@/components/ui/ControlPanel'
+import VitalsBar from '@/components/ui/VitalsBar'
 
 function Clock() {
   const [now, setNow] = useState(() => new Date())
@@ -84,6 +85,8 @@ export default function App() {
         </div>
         <ControlPanel />
       </main>
+
+      <Analytics />
     </div>
   )
 }

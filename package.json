@@ -3,15 +3,17 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "3D ICU Patient Monitor — interactive intensive-care simulator with real-time ECG/SpO₂, a 3D patient, ventilator and IV drip (React + React Three Fiber)",
+  "description": "3D ICU Patient Monitor - interactive intensive-care simulator with real-time ECG/SpO₂, a 3D patient, ventilator and IV drip (React + React Three Fiber)",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc -b && vite build",
+    "typecheck": "tsc -b",
     "preview": "vite preview"
   },
   "dependencies": {
     "@react-three/drei": "^10.0.6",
     "@react-three/fiber": "^9.1.2",
+    "@vercel/analytics": "^2.0.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "three": "^0.176.0",
@@ -19,8 +21,12 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.4",
+    "@types/node": "^26.1.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4.4.1",
     "tailwindcss": "^4.1.4",
+    "typescript": "^7.0.2",
     "vite": "^6.3.2"
   }
 }

@@ -1,15 +1,24 @@
 import { useMemo } from 'react'
 import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
+import type { Vec3 } from '@/types'
 
 /**
- * Pillow — a pillow GLB placed under the patient's head. It's a standalone
+ * Pillow - a pillow GLB placed under the patient's head. It's a standalone
  * prop (nothing to do with the patient's rig), auto-fitted by width and
  * centered so `pos` positions its center.
  *
- * Asset: "Pillow" (https://skfb.ly/pFUZn) by monupaswan944 — CC BY 4.0.
+ * Asset: "Pillow" (https://skfb.ly/pFUZn) by monupaswan944 - CC BY 4.0.
  */
-export default function Pillow({ targetWidth = 0.72, pos = [0, 1.22, -1.08], rot = [0, 0, 0] }) {
+export default function Pillow({
+  targetWidth = 0.72,
+  pos = [0, 1.22, -1.08],
+  rot = [0, 0, 0],
+}: {
+  targetWidth?: number
+  pos?: Vec3
+  rot?: Vec3
+}) {
   const { scene } = useGLTF('/models/pillow.glb')
 
   const fitted = useMemo(() => {
@@ -23,7 +32,7 @@ export default function Pillow({ targetWidth = 0.72, pos = [0, 1.22, -1.08], rot
     o.scale.setScalar(s)
     o.position.set(-center.x * s, -center.y * s, -center.z * s)
     o.traverse((m) => {
-      if (m.isMesh) {
+      if (m instanceof THREE.Mesh) {
         m.castShadow = true
         m.receiveShadow = true
       }

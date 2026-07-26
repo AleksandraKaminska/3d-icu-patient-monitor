@@ -1,14 +1,24 @@
 import { create } from 'zustand'
 
 /**
- * vitals.js — Global state of the patient's vital signs.
+ * vitals - Global state of the patient's vital signs.
  *
  * We keep "target" values set by the operator or a clinical scenario.
  * Each frame the Simulation component eases (lerps) the current values
  * toward the targets, so changes are smooth.
  */
 
-export const SCENARIOS = {
+export type Vitals = {
+  hr: number
+  spo2: number
+  respRate: number
+  tidalVolume: number
+  map: number
+}
+
+type Scenario = Vitals & { label: string; desc: string }
+
+export const SCENARIOS: Record<string, Scenario> = {
   stable: {
     label: 'Stable',
     desc: 'Patient within normal range, vitals stable.',
@@ -20,7 +30,7 @@ export const SCENARIOS = {
   },
   desaturation: {
     label: 'Desaturation',
-    desc: 'Progressive hypoxia — SpO₂ dropping, compensatory tachycardia.',
+    desc: 'Progressive hypoxia - SpO₂ dropping, compensatory tachycardia.',
     hr: 118,
     spo2: 79,
     respRate: 26,
@@ -29,7 +39,7 @@ export const SCENARIOS = {
   },
   tachycardia: {
     label: 'Tachycardia',
-    desc: 'Accelerated heart rate (HR 145) — the ECG curve compresses.',
+    desc: 'Accelerated heart rate (HR 145) - the ECG curve compresses.',
     hr: 145,
     spo2: 94,
     respRate: 22,
@@ -38,7 +48,7 @@ export const SCENARIOS = {
   },
   bradycardia: {
     label: 'Bradycardia',
-    desc: 'Slowed heart rate (HR 44) — the waves stretch out.',
+    desc: 'Slowed heart rate (HR 44) - the waves stretch out.',
     hr: 44,
     spo2: 95,
     respRate: 10,
@@ -47,11 +57,30 @@ export const SCENARIOS = {
   },
 }
 
-export const useVitals = create((set) => ({
+const base = (s: Scenario): Vitals => ({
+  hr: s.hr,
+  spo2: s.spo2,
+  respRate: s.respRate,
+  tidalVolume: s.tidalVolume,
+  map: s.map,
+})
+
+export type VitalsState = {
+  target: Vitals
+  current: Vitals
+  scenario: string
+  alarmsMuted: boolean
+  setTarget: (patch: Partial<Vitals>) => void
+  applyScenario: (key: string) => void
+  toggleMute: () => void
+  commitCurrent: (next: Partial<Vitals>) => void
+}
+
+export const useVitals = create<VitalsState>((set) => ({
   // Target values (driven by sliders / scenario)
-  target: { ...SCENARIOS.stable },
-  // Current values (ease toward target — updated in useFrame)
-  current: { ...SCENARIOS.stable },
+  target: base(SCENARIOS.stable),
+  // Current values (ease toward target - updated in useFrame)
+  current: base(SCENARIOS.stable),
   scenario: 'stable',
   alarmsMuted: false,
 
@@ -59,10 +88,7 @@ export const useVitals = create((set) => ({
     set((s) => ({ target: { ...s.target, ...patch }, scenario: 'custom' })),
 
   applyScenario: (key) =>
-    set(() => {
-      const p = SCENARIOS[key]
-      return { scenario: key, target: { ...p } }
-    }),
+    set(() => ({ scenario: key, target: base(SCENARIOS[key]) })),
 
   toggleMute: () => set((s) => ({ alarmsMuted: !s.alarmsMuted })),
 

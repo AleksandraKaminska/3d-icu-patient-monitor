@@ -1,9 +1,11 @@
 /**
- * Cannula — a small procedural IV cannula (tape dressing + luer connector) on
+ * Cannula - a small procedural IV cannula (tape dressing + luer connector) on
  * the back of the patient's hand, since the model has none. The IV line plugs
  * into the connector.
  */
-export default function Cannula({ pos = [0, 0, 0], rot = [0, 0, 0] }) {
+import type { Vec3 } from '@/types'
+
+export default function Cannula({ pos = [0, 0, 0], rot = [0, 0, 0] }: { pos?: Vec3; rot?: Vec3 }) {
   return (
     <group position={pos} rotation={rot}>
       {/* Transparent tape dressing flat on the back of the hand */}

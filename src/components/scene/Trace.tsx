@@ -1,22 +1,16 @@
 import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import type { Vec3 } from '@/types'
 
 /**
- * Trace — a one-dimensional curve drawn in 3D using a "sweeping cursor"
+ * Trace - a one-dimensional curve drawn in 3D using a "sweeping cursor"
  * method (like a real cardiomonitor).
  *
  * Instead of shifting the whole point array every frame, we keep a fixed
  * position buffer and overwrite the Y value under the current cursor, which
  * moves to the right at a constant sampling rate. Just ahead of the cursor
  * we leave a "blanked" gap, producing the freshly-drawn line effect.
- *
- * @param {() => number} sampler — returns the current signal value
- * @param {number} width — screen width (3D units)
- * @param {number} height — full deflection height
- * @param {number} samples — number of buffer points
- * @param {number} rate — samples per second
- * @param {string} color
  */
 export default function Trace({
   sampler,
@@ -26,11 +20,22 @@ export default function Trace({
   rate = 170,
   color = '#22e08a',
   position = [0, 0, 0],
+}: {
+  sampler: () => number
+  width?: number
+  height?: number
+  samples?: number
+  rate?: number
+  color?: string
+  position?: Vec3
 }) {
   const cursor = useRef(0)
   const acc = useRef(0)
 
-  const { geometry, positions } = useMemo(() => {
+  // Build the line object once (geometry buffer + material). The geometry is
+  // mutated in place each frame; rendering it via <primitive> sidesteps the
+  // `line` intrinsic clashing with SVG's <line> in TSX.
+  const { line, positions, geometry } = useMemo(() => {
     const positions = new Float32Array(samples * 3)
     for (let i = 0; i < samples; i++) {
       positions[i * 3] = -width / 2 + (i / (samples - 1)) * width
@@ -39,8 +44,10 @@ export default function Trace({
     }
     const geometry = new THREE.BufferGeometry()
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
-    return { geometry, positions }
-  }, [samples, width])
+    const material = new THREE.LineBasicMaterial({ color, toneMapped: false })
+    const line = new THREE.Line(geometry, material)
+    return { line, positions, geometry }
+  }, [samples, width, color])
 
   useFrame((_, rawDelta) => {
     const delta = Math.min(rawDelta, 0.05)
@@ -63,10 +70,5 @@ export default function Trace({
     geometry.attributes.position.needsUpdate = true
   })
 
-  return (
-    <line position={position}>
-      <primitive object={geometry} attach="geometry" />
-      <lineBasicMaterial color={color} toneMapped={false} />
-    </line>
-  )
+  return <primitive object={line} position={position} />
 }

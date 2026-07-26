@@ -1,18 +1,27 @@
 import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Text } from '@react-three/drei'
-import Trace from './Trace.jsx'
-import { simClock } from '../../store/simClock.js'
-import { useVitals } from '../../store/vitals.js'
+import Trace from '@/components/scene/Trace'
+import { simClock } from '@/store/simClock'
+import { useVitals } from '@/store/vitals'
+import type { Vec3, TextMesh } from '@/types'
 
 /**
- * VentScreen — the ventilator's live screen (airway-pressure waveform + VT/RR
+ * VentScreen - the ventilator's live screen (airway-pressure waveform + VT/RR
  * readouts), placed in world space so it can be aligned onto the model's
  * painted screen directly with `pos` / `rot` (intuitive world coordinates).
  */
-export default function VentScreen({ pos = [0, 0, 0], rot = [0, 0, 0], size = [0.34, 0.24] }) {
-  const vtRef = useRef()
-  const rrRef = useRef()
+export default function VentScreen({
+  pos = [0, 0, 0],
+  rot = [0, 0, 0],
+  size = [0.34, 0.24],
+}: {
+  pos?: Vec3
+  rot?: Vec3
+  size?: [number, number]
+}) {
+  const vtRef = useRef<TextMesh>(null)
+  const rrRef = useRef<TextMesh>(null)
   const acc = useRef(0)
 
   useFrame((_, delta) => {

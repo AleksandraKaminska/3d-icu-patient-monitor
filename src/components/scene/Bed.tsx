@@ -3,7 +3,7 @@ import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 
 /**
- * Bed — hospital bed loaded from a glTF/GLB asset (public/models).
+ * Bed - hospital bed loaded from a glTF/GLB asset (public/models).
  *
  * The raw model comes in an arbitrary scale/orientation, so we auto-fit it:
  *  - scale so its longest horizontal axis matches `targetLength`,
@@ -13,7 +13,7 @@ import * as THREE from 'three'
  * `lift` nudges the whole bed vertically for fine-tuning against the
  * procedural patient's mattress height.
  *
- * Asset: "Hospital Bed" (https://skfb.ly/oJZ6C) by Carlos.Maciel — CC BY 4.0.
+ * Asset: "Hospital Bed" (https://skfb.ly/oJZ6C) by Carlos.Maciel - CC BY 4.0.
  * Its mattress ends up at world y ≈ 1.12 after the fit.
  */
 export default function Bed({ targetLength = 2.7, lift = 0, ...props }) {
@@ -42,7 +42,7 @@ export default function Bed({ targetLength = 2.7, lift = 0, ...props }) {
 
     // Enable shadows on every mesh.
     obj.traverse((o) => {
-      if (o.isMesh) {
+      if (o instanceof THREE.Mesh) {
         o.castShadow = true
         o.receiveShadow = true
       }

@@ -3,7 +3,7 @@ import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 
 /**
- * VentilatorModel — ventilator loaded from a GLB (Tripo, meshopt). Auto-fitted:
+ * VentilatorModel - ventilator loaded from a GLB (Tripo, meshopt). Auto-fitted:
  * scaled to `targetHeight`, centered on X/Z, based on the floor. The live
  * screen readout is a separate component (VentScreen) placed in world space,
  * since the model has no distinct screen geometry to attach to.
@@ -22,7 +22,7 @@ export default function VentilatorModel({ targetHeight = 1.7, ...props }) {
     box1.getCenter(c)
     o.position.set(-c.x, -box1.min.y, -c.z)
     o.traverse((m) => {
-      if (m.isMesh) {
+      if (m instanceof THREE.Mesh) {
         m.castShadow = true
         m.receiveShadow = true
       }

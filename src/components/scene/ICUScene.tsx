@@ -1,20 +1,20 @@
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Environment, ContactShadows } from '@react-three/drei'
 import { Suspense } from 'react'
-import Simulation from './Simulation.jsx'
-import Room from './Room.jsx'
-import Bed from './Bed.jsx'
-import PatientModel from './PatientModel.jsx'
-import Pillow from './Pillow.jsx'
-import Cannula from './Cannula.jsx'
-import Cardiomonitor from './Cardiomonitor.jsx'
-import VentilatorModel from './VentilatorModel.jsx'
-import VentScreen from './VentScreen.jsx'
-import IVStand from './IVStand.jsx'
-import Tubes from './Tubes.jsx'
+import Simulation from '@/components/scene/Simulation'
+import Room from '@/components/scene/Room'
+import Bed from '@/components/scene/Bed'
+import PatientModel from '@/components/scene/PatientModel'
+import Pillow from '@/components/scene/Pillow'
+import Cannula from '@/components/scene/Cannula'
+import Cardiomonitor from '@/components/scene/Cardiomonitor'
+import VentilatorModel from '@/components/scene/VentilatorModel'
+import VentScreen from '@/components/scene/VentScreen'
+import IVStand from '@/components/scene/IVStand'
+import Tubes from '@/components/scene/Tubes'
 
 /**
- * ICUScene — modular intensive-care room scene.
+ * ICUScene - modular intensive-care room scene.
  * Each piece of equipment (bed, monitor, ventilator, IV stand) is its own component.
  */
 export default function ICUScene() {
@@ -25,8 +25,8 @@ export default function ICUScene() {
       camera={{ position: [4.2, 2.6, 4.8], fov: 45 }}
       className="!absolute inset-0"
     >
-      <color attach="background" args={['#0a0f1a']} />
-      <fog attach="fog" args={['#0a0f1a', 12, 26]} />
+      <color attach="background" args={['#0a0d11']} />
+      <fog attach="fog" args={['#0a0d11', 12, 26]} />
 
       {/* Clinical lighting */}
       <ambientLight intensity={0.35} />
@@ -44,7 +44,7 @@ export default function ICUScene() {
       <pointLight position={[-4, 3, -2]} intensity={20} color="#3b82f6" distance={12} />
 
       <Suspense fallback={null}>
-        {/* Simulation driver — no visual element */}
+        {/* Simulation driver - no visual element */}
         <Simulation />
 
         {/* Clean procedural room (floor + walls). */}
@@ -53,7 +53,7 @@ export default function ICUScene() {
         {/* Hospital bed from a GLB asset (auto-fitted). */}
         <Bed targetLength={2.7} lift={0} />
         {/* Patient model (GLB). The procedural patient is kept as a fallback
-            below — swap back if needed. */}
+            below - swap back if needed. */}
         <Pillow targetWidth={0.72} pos={[0, 1.13, -1.08]} />
         <PatientModel
           targetLength={2.3}
@@ -69,7 +69,7 @@ export default function ICUScene() {
         <VentilatorModel targetHeight={1.7} position={[-1.45, 0, -1.15]} rotation={[0, -Math.PI / 2, 0]} />
         {/* Live ventilator screen, placed in world space onto the model's
             painted screen (tune pos/rot against a render). */}
-        <VentScreen pos={[-1.45, 1.4, -1.14]} rot={[-0.35, 0, 0]} size={[0.32, 0.22]} />
+        <VentScreen pos={[-1.47, 1.39, -1.13]} rot={[-0.33, 0, 0]} size={[0.26, 0.19]} />
         <IVStand position={[-1.25, 0, -0.6]} rotation={[0, Math.PI, 0]} />
         <Tubes />
 

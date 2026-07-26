@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react'
-import { useVitals, SCENARIOS } from '../../store/vitals.js'
+import { useEffect, useState, type ReactNode } from 'react'
+import { useVitals, SCENARIOS, type Vitals } from '@/store/vitals'
 
 /**
- * ControlPanel — clinical/editorial control panel.
+ * ControlPanel - clinical/editorial control panel.
  * Pick a scenario or set target vitals with sliders; everything writes to the
  * Zustand store and the 3D scene reacts.
  */
 
-function SectionTitle({ children }) {
+function SectionTitle({ children }: { children: ReactNode }) {
   return (
     <h2 className="text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ color: 'var(--faint)' }}>
       {children}
@@ -15,7 +15,23 @@ function SectionTitle({ children }) {
   )
 }
 
-function Slider({ label, unit, value, min, max, step = 1, onChange }) {
+function Slider({
+  label,
+  unit,
+  value,
+  min,
+  max,
+  step = 1,
+  onChange,
+}: {
+  label: string
+  unit: string
+  value: number
+  min: number
+  max: number
+  step?: number
+  onChange: (v: number) => void
+}) {
   const pct = ((value - min) / (max - min)) * 100
   return (
     <label className="block">
@@ -52,7 +68,7 @@ export default function ControlPanel() {
     return unsub
   }, [])
 
-  const update = (patch) => {
+  const update = (patch: Partial<Vitals>) => {
     setT((prev) => ({ ...prev, ...patch }))
     setTarget(patch)
   }
@@ -94,7 +110,7 @@ export default function ControlPanel() {
         </div>
         <p className="text-[11px] leading-relaxed" style={{ color: 'var(--faint)' }}>
           {scenario === 'custom'
-            ? 'Manual mode — vitals set with the sliders below.'
+            ? 'Manual mode - vitals set with the sliders below.'
             : SCENARIOS[scenario]?.desc}
         </p>
       </section>
@@ -116,11 +132,11 @@ export default function ControlPanel() {
         <SectionTitle>Generated in code</SectionTitle>
         <ul className="flex flex-col gap-1.5 text-[11px] leading-relaxed" style={{ color: 'var(--faint)' }}>
           {[
-            'ECG — sum of Gaussian P-QRS-T waves',
-            'SpO₂ — plethysmograph from sine harmonics',
-            'Skin — cyanosis tint by saturation',
-            'IV drip — drop fall from a gravity vector',
-            'Tubes — Catmull-Rom splines in 3D',
+            'ECG - sum of Gaussian P-QRS-T waves',
+            'SpO₂ - plethysmograph from sine harmonics',
+            'Skin - cyanosis tint by saturation',
+            'IV drip - drop fall from a gravity vector',
+            'Tubes - Catmull-Rom splines in 3D',
           ].map((line) => (
             <li key={line} className="flex gap-2">
               <span style={{ color: 'var(--accent)' }}>·</span>

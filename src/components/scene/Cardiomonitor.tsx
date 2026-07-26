@@ -1,14 +1,15 @@
 import { useMemo, useRef } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, type ThreeElements } from '@react-three/fiber'
 import { useGLTF, Text } from '@react-three/drei'
 import * as THREE from 'three'
-import Trace from './Trace.jsx'
-import { simClock } from '../../store/simClock.js'
-import { useVitals } from '../../store/vitals.js'
-import { ecgSample, plethSample } from '../../lib/ecg.js'
+import Trace from '@/components/scene/Trace'
+import { simClock } from '@/store/simClock'
+import { useVitals } from '@/store/vitals'
+import { ecgSample, plethSample } from '@/lib/ecg'
+import type { Vec3, TextMesh } from '@/types'
 
 /**
- * Cardiomonitor — bedside monitor loaded from a GLB, with our live procedural
+ * Cardiomonitor - bedside monitor loaded from a GLB, with our live procedural
  * screen (ECG + SpO2 traces + HR/SpO2 digits) overlaid on the model's display.
  *
  * The model's screen sits on the "Monitor" block's front face, facing local
@@ -20,7 +21,6 @@ import { ecgSample, plethSample } from '../../lib/ecg.js'
  * Asset: heart_monitor.glb.
  */
 
-const MODEL_H = 73.687
 const MODEL_CENTER = [1.64, 18.19, 0.02]
 const MODEL_MIN_Y = -18.65
 const SCREEN_MODEL = [0, 46.85, -4.9] // screen center in model space
@@ -30,10 +30,14 @@ export default function Cardiomonitor({
   screenSize = [0.4, 0.3],
   screenTrim = [0, 0, 0], // fine XYZ nudge of the overlay onto the glass
   ...props
-}) {
+}: {
+  targetHeight?: number
+  screenSize?: [number, number]
+  screenTrim?: Vec3
+} & ThreeElements['group']) {
   const { scene } = useGLTF('/models/heart_monitor.glb')
-  const hrRef = useRef()
-  const spo2Ref = useRef()
+  const hrRef = useRef<TextMesh>(null)
+  const spo2Ref = useRef<TextMesh>(null)
   const digitAcc = useRef(0)
 
   const { fitted, screenPos } = useMemo(() => {
@@ -48,13 +52,13 @@ export default function Cardiomonitor({
     box1.getCenter(c)
     o.position.set(-c.x, -box1.min.y, -c.z)
     o.traverse((m) => {
-      if (m.isMesh) {
+      if (m instanceof THREE.Mesh) {
         m.castShadow = true
         m.receiveShadow = true
       }
     })
     // Screen center in the outer-group frame: s * modelPoint + centeringOffset.
-    const screenPos = [
+    const screenPos: Vec3 = [
       s * SCREEN_MODEL[0] - MODEL_CENTER[0] * s + screenTrim[0],
       s * SCREEN_MODEL[1] - MODEL_MIN_Y * s + screenTrim[1],
       s * SCREEN_MODEL[2] - MODEL_CENTER[2] * s + screenTrim[2],
@@ -77,7 +81,7 @@ export default function Cardiomonitor({
     <group {...props}>
       <primitive object={fitted} />
 
-      {/* Live screen overlay — faces model-local -Z (hence the 180° flip) */}
+      {/* Live screen overlay - faces model-local -Z (hence the 180° flip) */}
       <group position={screenPos} rotation={[0, Math.PI, 0]}>
         {/* Dark display backing */}
         <mesh position={[0, 0, 0.002]}>

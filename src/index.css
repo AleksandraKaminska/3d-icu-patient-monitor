@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Design system — clinical / editorial premium.
+/* Design system - clinical / editorial premium.
    One signature accent (clinical teal), hairline dividers, calm typography. */
 :root {
   --bg: #0a0d11;
@@ -52,7 +52,7 @@ body {
   border-radius: 999px;
 }
 
-/* Refined range slider — filled track set inline per value */
+/* Refined range slider - filled track set inline per value */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;

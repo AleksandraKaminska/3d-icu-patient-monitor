@@ -1,14 +1,14 @@
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
-import { useVitals } from '../../store/vitals.js'
-import { simClock } from '../../store/simClock.js'
-import { beatPeriod } from '../../lib/ecg.js'
+import { useVitals } from '@/store/vitals'
+import { simClock } from '@/store/simClock'
+import { beatPeriod } from '@/lib/ecg'
 
 /**
- * Simulation — the heart of the simulation (no visual element).
+ * Simulation - the heart of the simulation (no visual element).
  *
  * Every frame it:
- *  1. Smoothly eases current values toward the targets — lerp.
+ *  1. Smoothly eases current values toward the targets - lerp.
  *  2. Advances the heart / breath / drip phases based on HR and resp rate.
  *  3. Periodically commits `current` to the store so the UI updates its digits.
  */
@@ -37,10 +37,10 @@ export default function Simulation() {
     // Breathing: respRate breaths/min -> period in seconds.
     const respPeriod = 60 / Math.max(1, next.respRate)
     simClock.respPhase = (simClock.respPhase + (delta / respPeriod) * Math.PI * 2) % (Math.PI * 2)
-    // Inhale/exhale as a normalized sine (0..1) — drives chest and piston motion.
+    // Inhale/exhale as a normalized sine (0..1) - drives chest and piston motion.
     simClock.breath = (Math.sin(simClock.respPhase - Math.PI / 2) + 1) / 2
 
-    // IV drop: rate depends on MAP (pressure) — faster when lower.
+    // IV drop: rate depends on MAP (pressure) - faster when lower.
     const dripRate = 0.6 + (90 - next.map) * 0.02
     simClock.dripT = (simClock.dripT + delta * dripRate) % 1
 

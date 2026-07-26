@@ -3,7 +3,7 @@ import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 
 /**
- * IVStand — IV pole + drip loaded from a GLB (embedded PBR, transmissive bag).
+ * IVStand - IV pole + drip loaded from a GLB (embedded PBR, transmissive bag).
  *
  * The asset bakes TWO poles into one geometry (one with a drip bag, one bare),
  * so we keep only one half: triangles are filtered by their centroid on the
@@ -12,14 +12,14 @@ import * as THREE from 'three'
  * Auto-fitted after filtering: scaled to `targetHeight`, centered on X/Z,
  * based on the floor.
  *
- * Asset: "IV Pole" (https://skfb.ly/6RzEu) by Mouch — CC BY 4.0.
+ * Asset: "IV Pole" (https://skfb.ly/6RzEu) by Mouch - CC BY 4.0.
  */
-function keepHalf(geo, keepPositive) {
+function keepHalf(geo: THREE.BufferGeometry, keepPositive: boolean): THREE.BufferGeometry {
   const g = geo.index ? geo.toNonIndexed() : geo.clone()
   const pos = g.attributes.position
   const nor = g.attributes.normal
   const uv = g.attributes.uv
-  const P = [], N = [], U = []
+  const P: number[] = [], N: number[] = [], U: number[] = []
   for (let t = 0; t < pos.count; t += 3) {
     const cy = (pos.getY(t) + pos.getY(t + 1) + pos.getY(t + 2)) / 3
     if ((keepPositive && cy >= 0) || (!keepPositive && cy < 0)) {
@@ -47,7 +47,7 @@ export default function IVStand({ targetHeight = 2.4, keepPositive = true, ...pr
 
     // Drop the second pole by keeping one half of the geometry.
     o.traverse((m) => {
-      if (m.isMesh) m.geometry = keepHalf(m.geometry, keepPositive)
+      if (m instanceof THREE.Mesh) m.geometry = keepHalf(m.geometry, keepPositive)
     })
 
     // Auto-fit: scale to targetHeight (Y), center X/Z, base on the floor.
@@ -61,7 +61,7 @@ export default function IVStand({ targetHeight = 2.4, keepPositive = true, ...pr
     o.position.set(-c.x, -box1.min.y, -c.z)
 
     o.traverse((m) => {
-      if (m.isMesh) {
+      if (m instanceof THREE.Mesh) {
         m.castShadow = true
         m.receiveShadow = true
       }
@@ -70,7 +70,7 @@ export default function IVStand({ targetHeight = 2.4, keepPositive = true, ...pr
   }, [scene, targetHeight, keepPositive])
 
   // Wrap in a group: the fitted object keeps its internal centering/floor
-  // offset, and the scene's position/rotation apply to the group — so they
+  // offset, and the scene's position/rotation apply to the group - so they
   // compose instead of the props overwriting the centering.
   return (
     <group {...props}>

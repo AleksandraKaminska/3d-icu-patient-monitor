@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { useVitals } from '../../store/vitals.js'
+import { useVitals } from '@/store/vitals'
 
 /**
- * VitalsBar — the live numeric vitals strip.
+ * VitalsBar - the live numeric vitals strip.
  *
  * Editorial premium look: each vital carries a small signature-colour dot and
  * a calm near-white value; the value only turns amber/red when it leaves the
@@ -15,16 +15,37 @@ const RANGES = {
   map: { low: 62, high: 108, warnLow: 68, warnHigh: 100 },
 }
 
-function level(v, r) {
+type Range = { low: number; high: number; warnLow: number; warnHigh: number }
+type Level = 'ok' | 'warn' | 'alarm'
+
+function level(v: number, r?: Range): Level {
   if (!r) return 'ok'
   if (v < r.low || v > r.high) return 'alarm'
   if (v < r.warnLow || v > r.warnHigh) return 'warn'
   return 'ok'
 }
 
-const LEVEL_COLOR = { ok: 'var(--text)', warn: 'var(--warn)', alarm: 'var(--alarm)' }
+const LEVEL_COLOR: Record<Level, string> = {
+  ok: 'var(--text)',
+  warn: 'var(--warn)',
+  alarm: 'var(--alarm)',
+}
 
-function Vital({ dot, label, value, unit, range, pulse }) {
+function Vital({
+  dot,
+  label,
+  value,
+  unit,
+  range,
+  pulse,
+}: {
+  dot: string
+  label: string
+  value: number
+  unit: string
+  range?: Range
+  pulse?: boolean
+}) {
   const lvl = level(value, range)
   return (
     <div className="flex flex-col justify-center px-5 py-3 first:pl-6">
